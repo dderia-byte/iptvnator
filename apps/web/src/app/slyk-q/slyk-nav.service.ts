@@ -1,5 +1,7 @@
 import { DestroyRef, Injectable, signal } from '@angular/core';
-import { SlykKeyPress } from './slyk-keys';
+import { SlykKey, SlykKeyPress } from './slyk-keys';
+
+const POINTER_IDLE_MS = 3000;
 
 /**
  * Where the live picture sits on the 1920×1080 stage. The positions are the
@@ -17,7 +19,11 @@ export interface SlykScreen {
 @Injectable()
 export class SlykNavService {
     readonly frame = signal<SlykPlayerFrame>('pig');
+    /** True while the mouse has moved recently; hides again when idle. */
+    readonly pointerActive = signal(false);
     private readonly stack: SlykScreen[] = [];
+    private globalKeys: (key: SlykKey) => boolean = () => false;
+    private pointerTimer?: ReturnType<typeof setTimeout>;
 
     /** Registers a screen (or overlay) until its injector is destroyed. */
     register(
@@ -37,8 +43,27 @@ export class SlykNavService {
         });
     }
 
+    /** Receiver-wide fallback for keys the top screen leaves unhandled. */
+    setGlobalKeys(handler: (key: SlykKey) => boolean): void {
+        this.globalKeys = handler;
+    }
+
     dispatch(press: SlykKeyPress): boolean {
         const top = this.stack[this.stack.length - 1];
-        return top ? top.onKey(press) : false;
+        return (top ? top.onKey(press) : false) || this.globalKeys(press.key);
+    }
+
+    /** A remote key pressed with the mouse (on-screen buttons, wheel). */
+    press(key: SlykKey): boolean {
+        return this.dispatch({ key, digit: null });
+    }
+
+    pointerMoved(): void {
+        this.pointerActive.set(true);
+        clearTimeout(this.pointerTimer);
+        this.pointerTimer = setTimeout(
+            () => this.pointerActive.set(false),
+            POINTER_IDLE_MS
+        );
     }
 }

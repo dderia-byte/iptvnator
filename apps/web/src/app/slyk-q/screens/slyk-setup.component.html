@@ -14,18 +14,38 @@
     <div
         class="row slyk-abs"
         [style.top.px]="385 + i * 78"
-        (click)="index.set(i)"
-        (dblclick)="cycle(row, 1)"
+        role="option"
+        tabindex="-1"
+        [attr.aria-selected]="i === index()"
+        (mouseenter)="index.set(i)"
+        (click)="activate(row)"
+        (keydown.enter)="activate(row)"
     >
         <span class="label">{{ row.label }}</span>
         @if (row.choices) {
             <span class="value">
                 @if (i === index()) {
-                    <span class="arrow">‹</span>
+                    <span
+                        class="arrow"
+                        role="button"
+                        tabindex="-1"
+                        aria-label="Previous value"
+                        (click)="$event.stopPropagation(); cycle(row, -1)"
+                        (keydown.enter)="cycle(row, -1)"
+                        >‹</span
+                    >
                 }
                 {{ valueLabel(row) }}
                 @if (i === index()) {
-                    <span class="arrow">›</span>
+                    <span
+                        class="arrow"
+                        role="button"
+                        tabindex="-1"
+                        aria-label="Next value"
+                        (click)="$event.stopPropagation(); cycle(row, 1)"
+                        (keydown.enter)="cycle(row, 1)"
+                        >›</span
+                    >
                 }
             </span>
         } @else if (row.link) {

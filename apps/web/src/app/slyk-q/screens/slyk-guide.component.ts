@@ -75,9 +75,27 @@ export class SlykGuideComponent implements SlykScreen {
         return !!active && !!channel && channel.id === active.id && channel.url === active.url;
     }
 
+    pickRow(row: number): void {
+        this.guide.channelIndex.set(this.guide.pageStart() + row);
+    }
+
     pick(row: number, x: number): void {
         this.guide.channelIndex.set(this.guide.pageStart() + row);
         this.guide.cursorX.set(x);
+    }
+
+    /** OK: zap into the PiG; OK on the playing service goes full screen. */
+    activate(): void {
+        const channel = this.channel();
+        if (!channel) {
+            return;
+        }
+        const active = this.tv.activeChannel();
+        if (active?.id === channel.id && active.url === channel.url) {
+            void this.router.navigateByUrl('/tv/watch');
+        } else {
+            this.tv.play(channel);
+        }
     }
 
     onKey({ key }: SlykKeyPress): boolean {
@@ -85,19 +103,9 @@ export class SlykGuideComponent implements SlykScreen {
             return true;
         }
         switch (key) {
-            case 'ok': {
-                const channel = this.channel();
-                if (!channel) {
-                    return true;
-                }
-                const active = this.tv.activeChannel();
-                if (active?.id === channel.id && active.url === channel.url) {
-                    void this.router.navigateByUrl('/tv/watch');
-                } else {
-                    this.tv.play(channel);
-                }
+            case 'ok':
+                this.activate();
                 return true;
-            }
             case 'red':
                 this.tv.stepBouquet(1);
                 this.guide.channelIndex.set(0);

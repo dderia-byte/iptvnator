@@ -14,6 +14,11 @@
         [class.selected]="r === guide.selectedRow()"
         [style.top.px]="795 + r * rowHeight"
         [style.height.px]="rowHeight"
+        role="button"
+        tabindex="-1"
+        (mouseenter)="pickRow(r)"
+        (click)="pickRow(r); watch()"
+        (keydown.enter)="watch()"
     >
         {{ tv.displayName(row.channel) }}
     </div>
@@ -26,6 +31,11 @@
             [style.width.px]="cell.width"
             [style.top.px]="795 + r * rowHeight"
             [style.height.px]="rowHeight"
+            role="button"
+            tabindex="-1"
+            (mouseenter)="pick(r, cell.left + 1)"
+            (click)="pick(r, cell.left + 1); watch()"
+            (keydown.enter)="watch()"
         >
             {{ cell.title }}
         </div>

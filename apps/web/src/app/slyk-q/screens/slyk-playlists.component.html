@@ -15,7 +15,12 @@
     <div
         class="row slyk-abs"
         [style.top.px]="385 + i * 78"
-        (click)="index.set(pageStart() + i); open(playlist)"
+        role="option"
+        tabindex="-1"
+        [attr.aria-selected]="pageStart() + i === index()"
+        (mouseenter)="index.set(pageStart() + i)"
+        (click)="open(playlist)"
+        (keydown.enter)="open(playlist)"
     >
         <span class="name slyk-nowrap">{{ label(playlist) }}</span>
         @if (isActive(playlist)) {

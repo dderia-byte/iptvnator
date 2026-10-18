@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { Channel } from '@iptvnator/shared/interfaces';
 import { SlykEpgService } from './slyk-epg.service';
+import { SlykNavService } from './slyk-nav.service';
 import { slykTime } from './slyk-format';
 import { SlykTvService } from './slyk-tv.service';
 
@@ -115,7 +116,14 @@ export class SlykTemplateComponent {
         ></div>
         @for (key of keys; track key.colour; let i = $index) {
             @if (labels()[i]) {
-                <div class="slyk-key slyk-abs" [style.left.px]="key.x">
+                <div
+                    class="slyk-key slyk-abs"
+                    role="button"
+                    tabindex="-1"
+                    [style.left.px]="key.x"
+                    (click)="nav.press(key.colour)"
+                    (keydown.enter)="nav.press(key.colour)"
+                >
                     <span class="dot" [style.background]="key.fill"></span>
                     <span class="label">{{ labels()[i] }}</span>
                 </div>
@@ -151,6 +159,7 @@ export class SlykTemplateComponent {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SlykButtonsComponent {
+    readonly nav = inject(SlykNavService);
     readonly labels = input<readonly string[]>([]);
     readonly full = input(false);
     readonly keys = [
@@ -158,7 +167,7 @@ export class SlykButtonsComponent {
         { colour: 'green', x: 827, fill: '#2bb24a' },
         { colour: 'yellow', x: 1142, fill: '#f4e01b' },
         { colour: 'blue', x: 1457, fill: '#2f5fd0' },
-    ];
+    ] as const;
 }
 
 /** Channel logo (Slyk18Picon) with the service name as fallback. */

@@ -1,4 +1,9 @@
-<div class="slyk-viewport">
+<div
+    class="slyk-viewport"
+    [class.pointer]="nav.pointerActive()"
+    (wheel)="onWheel($event)"
+    (contextmenu)="onContextMenu($event)"
+>
     <div class="slyk-stage" [style.transform]="stageTransform()">
         @if (tv.playback(); as playback) {
             <div

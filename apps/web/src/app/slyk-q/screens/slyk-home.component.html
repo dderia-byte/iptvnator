@@ -12,8 +12,11 @@
     @for (item of items; track item.label; let i = $index) {
         <li
             role="menuitem"
+            tabindex="-1"
             [class.selected]="area() === 'menu' && i === menuIndex()"
+            (mouseenter)="area.set('menu'); menuIndex.set(i)"
             (click)="menuIndex.set(i); item.action()"
+            (keydown.enter)="item.action()"
         >
             {{ item.label }}
         </li>
@@ -26,10 +29,14 @@
 @for (channel of picks(); track $index; let i = $index) {
     <div
         class="tile slyk-abs"
+        role="button"
+        tabindex="-1"
         [class.focused]="area() === 'tiles' && i === tileIndex()"
         [style.left.px]="tileLeft(i)"
         [style.top.px]="tileTop(i)"
-        (click)="tileIndex.set(i); area.set('tiles')"
+        (mouseenter)="area.set('tiles'); tileIndex.set(i)"
+        (click)="openTile(i)"
+        (keydown.enter)="openTile(i)"
     >
         <div class="poster">
             <app-slyk-picon

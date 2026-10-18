@@ -109,13 +109,10 @@ export class SlykChannelsComponent implements SlykScreen {
         return this.epg.progress(this.epg.nowNext(channel).now) * 100;
     }
 
+    /** Click = OK on that service (hover already moved the highlight). */
     select(rowIndex: number): void {
-        const absolute = this.pageStart() + rowIndex;
-        if (absolute === this.index()) {
-            this.zap();
-        } else {
-            this.index.set(absolute);
-        }
+        this.index.set(this.pageStart() + rowIndex);
+        this.zap();
     }
 
     onKey({ key }: SlykKeyPress): boolean {

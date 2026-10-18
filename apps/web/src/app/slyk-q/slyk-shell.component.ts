@@ -14,12 +14,13 @@ import { isTypingInInput } from '@iptvnator/portal/shared/util';
 import { WebPlayerViewComponent } from '@iptvnator/ui/playback';
 import { SettingsStore } from '@iptvnator/services';
 import { SlykEpgService } from './slyk-epg.service';
-import { toSlykKey } from './slyk-keys';
+import { SlykKey, toSlykKey } from './slyk-keys';
 import { SlykNavService } from './slyk-nav.service';
 import { SlykTvService } from './slyk-tv.service';
 
 const STAGE_WIDTH = 1920;
 const STAGE_HEIGHT = 1080;
+const WHEEL_STEP_MS = 120;
 
 /**
  * The Slyk Q receiver. Everything is laid out on a fixed 1920×1080 stage
@@ -52,6 +53,9 @@ export class SlykShellComponent implements OnInit {
             `translate(${this.offsetX()}px, ${this.offsetY()}px) scale(${this.scale()})`
     );
     readonly volume = signal(readStoredVolume());
+    private lastWheel = 0;
+    private lastPointerX = -1;
+    private lastPointerY = -1;
     readonly player = computed(
         () => this.tv.playerOverride() ?? this.settingsStore.player() ?? null
     );
@@ -73,6 +77,7 @@ export class SlykShellComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.nav.setGlobalKeys((key) => this.handleGlobal(key));
         this.fit();
         void this.tv.ensureLoaded();
     }
@@ -96,14 +101,49 @@ export class SlykShellComponent implements OnInit {
         if (!press) {
             return;
         }
-        if (this.nav.dispatch(press) || this.handleGlobal(press.key)) {
+        if (this.nav.dispatch(press)) {
             event.preventDefault();
             event.stopPropagation();
         }
     }
 
+    /**
+     * Chromium also fires mousemove when the layout changes under a still
+     * cursor (screen changes, the PiG resizing); only real movement counts.
+     */
+    @HostListener('document:mousemove', ['$event'])
+    onMouseMove(event: MouseEvent): void {
+        if (event.screenX === this.lastPointerX && event.screenY === this.lastPointerY) {
+            return;
+        }
+        this.lastPointerX = event.screenX;
+        this.lastPointerY = event.screenY;
+        this.nav.pointerMoved();
+    }
+
+    /** Wheel = up/down (shift: left/right), throttled to one step per notch. */
+    onWheel(event: WheelEvent): void {
+        event.preventDefault();
+        const now = Date.now();
+        if (now - this.lastWheel < WHEEL_STEP_MS) {
+            return;
+        }
+        this.lastWheel = now;
+        const forward = (event.deltaY || event.deltaX) > 0;
+        const horizontal = event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY);
+        this.nav.press(
+            horizontal ? (forward ? 'right' : 'left') : forward ? 'down' : 'up'
+        );
+    }
+
+    /** Right click is the remote's Back / Exit, as in media-centre UIs. */
+    onContextMenu(event: MouseEvent): void {
+        event.preventDefault();
+        this.nav.press('back');
+    }
+
     /** Receiver-wide keys any screen leaves unhandled. */
-    private handleGlobal(key: string): boolean {
+    private handleGlobal(key: SlykKey): boolean {
         switch (key) {
             case 'menu':
                 void this.router.navigate(['/tv']);

@@ -39,7 +39,27 @@
 
 <!-- bouquet title bar: TimeLineBG 491,323 1430×62 -->
 <div class="slyk-timeline-bar" style="left: 491px; top: 323px; width: 1430px; height: 62px"></div>
-<div class="bouquet slyk-abs slyk-bold">{{ tv.bouquet().label }}</div>
+<div class="bouquet slyk-abs slyk-bold">
+    <span
+        class="bouquet-arrow"
+        role="button"
+        tabindex="-1"
+        aria-label="Previous bouquet"
+        (click)="tv.stepBouquet(-1)"
+        (keydown.enter)="tv.stepBouquet(-1)"
+        >‹</span
+    >
+    {{ tv.bouquet().label }}
+    <span
+        class="bouquet-arrow"
+        role="button"
+        tabindex="-1"
+        aria-label="Next bouquet"
+        (click)="tv.stepBouquet(1)"
+        (keydown.enter)="tv.stepBouquet(1)"
+        >›</span
+    >
+</div>
 
 <!-- service list -->
 @if (channels().length === 0) {
@@ -55,7 +75,10 @@
         [class.selected]="pageStart() + row === index()"
         [class.playing]="isPlaying(channel)"
         [style.top.px]="385 + row * rowHeight"
+        tabindex="-1"
+        (mouseenter)="index.set(pageStart() + row)"
         (click)="select(row)"
+        (keydown.enter)="select(row)"
     >
         <span class="number">{{ tv.numberOf(channel) }}</span>
         <span class="name slyk-nowrap">{{ tv.displayName(channel) }}</span>

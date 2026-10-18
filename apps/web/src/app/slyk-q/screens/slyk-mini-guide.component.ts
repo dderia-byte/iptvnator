@@ -48,20 +48,33 @@ export class SlykMiniGuideComponent implements SlykScreen {
         this.guide.focus(this.tv.activeChannel());
     }
 
+    pickRow(row: number): void {
+        this.guide.channelIndex.set(this.guide.pageStart() + row);
+    }
+
+    pick(row: number, x: number): void {
+        this.pickRow(row);
+        this.guide.cursorX.set(x);
+    }
+
+    /** Zaps to the highlighted service and closes the guide. */
+    watch(): void {
+        const channel = this.guide.selectedChannel();
+        if (channel) {
+            this.tv.play(channel);
+        }
+        this.closed.emit();
+    }
+
     onKey({ key }: SlykKeyPress): boolean {
         if (this.guide.move(key)) {
             return true;
         }
         switch (key) {
             case 'ok':
-            case 'green': {
-                const channel = this.guide.selectedChannel();
-                if (channel) {
-                    this.tv.play(channel);
-                }
-                this.closed.emit();
+            case 'green':
+                this.watch();
                 return true;
-            }
             case 'back':
             case 'info':
                 this.closed.emit();

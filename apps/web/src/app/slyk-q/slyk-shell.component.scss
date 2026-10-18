@@ -41,7 +41,19 @@ app-slyk-shell {
     inset: 0;
     overflow: hidden;
     background: #000;
+    // TV-style: the cursor only shows while the mouse is in use.
     cursor: none;
+
+    &.pointer {
+        cursor: default;
+
+        [role='option'],
+        [role='menuitem'],
+        [role='button'],
+        .slyk-clickable {
+            cursor: pointer;
+        }
+    }
 }
 
 .slyk-stage {

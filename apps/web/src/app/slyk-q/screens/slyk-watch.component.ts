@@ -38,6 +38,17 @@ export class SlykWatchComponent implements SlykScreen {
     readonly pinned = signal(false);
     readonly miniGuide = signal(false);
     readonly numberEntry = signal('');
+    readonly nav = inject(SlykNavService);
+    /** On-screen remote for mouse users, shown while the mouse moves. */
+    readonly mouseActions = [
+        { label: 'Menu', run: () => this.nav.press('menu') },
+        { label: 'Channels', run: () => this.nav.press('up') },
+        { label: 'TV Guide', run: () => this.nav.press('epg') },
+        { label: 'Mini Guide', run: () => this.nav.press('right') },
+        { label: 'CH −', run: () => this.nav.press('channelDown') },
+        { label: 'CH +', run: () => this.nav.press('channelUp') },
+        { label: 'Info', run: () => this.nav.press('info') },
+    ];
     private infobarTimer?: ReturnType<typeof setTimeout>;
     private numberTimer?: ReturnType<typeof setTimeout>;
 
@@ -59,7 +70,7 @@ export class SlykWatchComponent implements SlykScreen {
 
     constructor() {
         const destroyRef = inject(DestroyRef);
-        inject(SlykNavService).register(this, destroyRef, 'full');
+        this.nav.register(this, destroyRef, 'full');
         destroyRef.onDestroy(() => {
             clearTimeout(this.infobarTimer);
             clearTimeout(this.numberTimer);

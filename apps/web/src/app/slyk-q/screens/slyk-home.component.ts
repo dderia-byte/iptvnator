@@ -132,14 +132,21 @@ export class SlykHomeComponent implements SlykScreen {
                 return true;
             }
             case 'ok':
-                this.tv.play(this.picks()[index]);
-                this.go('/tv/watch');
+                this.openTile(index);
                 return true;
             case 'back':
                 this.area.set('menu');
                 return true;
             default:
                 return false;
+        }
+    }
+
+    openTile(index: number): void {
+        const channel = this.picks()[index];
+        if (channel) {
+            this.tv.play(channel);
+            this.go('/tv/watch');
         }
     }
 

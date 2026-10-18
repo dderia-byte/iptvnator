@@ -1,11 +1,51 @@
+<!-- the whole picture: click toggles the infobar, like OK -->
+<div
+    class="surface slyk-abs"
+    role="button"
+    tabindex="-1"
+    aria-label="Show or hide programme information"
+    (click)="nav.press('ok')"
+    (keydown.enter)="nav.press('ok')"
+></div>
+
+@if (nav.pointerActive() && !miniGuide()) {
+    <!-- mouse bar in the SecondInfoBar top band (0,0 1920×159) -->
+    <div class="mouse-bar slyk-abs">
+        @for (action of mouseActions; track action.label) {
+            <span
+                class="mouse-button"
+                role="button"
+                tabindex="-1"
+                (click)="action.run()"
+                (keydown.enter)="action.run()"
+                >{{ action.label }}</span
+            >
+        }
+    </div>
+}
+
 @if (infobar() && channel()) {
     <!-- InfoBar: blackglass from 760 and infobar1.png from 724 -->
     <div class="ib-glass slyk-abs"></div>
     <div class="ib-panel slyk-abs"></div>
 
     <div class="ib-date slyk-abs">{{ date() }}</div>
-    <div class="ib-arrow up slyk-abs"></div>
-    <div class="ib-arrow down slyk-abs"></div>
+    <div
+        class="ib-arrow up slyk-abs"
+        role="button"
+        tabindex="-1"
+        aria-label="Next channel"
+        (click)="tv.zap(1)"
+        (keydown.enter)="tv.zap(1)"
+    ></div>
+    <div
+        class="ib-arrow down slyk-abs"
+        role="button"
+        tabindex="-1"
+        aria-label="Previous channel"
+        (click)="tv.zap(-1)"
+        (keydown.enter)="tv.zap(-1)"
+    ></div>
     <div class="ib-channel slyk-abs">
         <span class="slyk-nowrap">{{ number() }} {{ name() }}</span>
     </div>

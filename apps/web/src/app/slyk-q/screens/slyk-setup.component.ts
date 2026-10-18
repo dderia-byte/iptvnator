@@ -149,6 +149,15 @@ export class SlykSetupComponent implements SlykScreen {
         }
     }
 
+    /** Click: links open, values step forward (the arrows step either way). */
+    activate(row: ConfigRow): void {
+        if (row.link) {
+            void this.router.navigateByUrl(row.link);
+        } else {
+            this.cycle(row, 1);
+        }
+    }
+
     cycle(row: ConfigRow, delta: 1 | -1): void {
         if (!row.choices || !row.key) {
             return;
