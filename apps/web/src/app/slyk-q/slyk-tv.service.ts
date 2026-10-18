@@ -26,13 +26,15 @@ import {
     Channel,
     PlaylistMeta,
     ResolvedPortalPlayback,
+    StreamFormat,
     VideoPlayer,
 } from '@iptvnator/shared/interfaces';
 import {
-    canFetchXtream,
-    fetchXtreamLiveChannels,
-    xtreamXmltvUrl,
-} from './slyk-xtream';
+    XtreamApiService,
+    XtreamCredentials,
+    XtreamUrlService,
+} from '@iptvnator/portal/xtream/data-access';
+import { xtreamLiveChannels, xtreamXmltvUrl } from './slyk-xtream';
 
 /** A Slyk "bouquet": all channels, favourites, or one playlist group. */
 export interface SlykBouquet {
@@ -76,6 +78,10 @@ export class SlykTvService {
     );
     private readonly epgService = inject(EpgService);
     private readonly xtreamCache = new Map<string, Channel[]>();
+    private readonly xtreamApi = inject(XtreamApiService);
+    private readonly xtreamUrls = inject(XtreamUrlService);
+    /** Why the last source could not be opened, shown on the channel list. */
+    readonly loadError = signal<string | null>(null);
     private loadedPlaylistId: string | null = null;
     private loadRequest = 0;
 
@@ -251,7 +257,7 @@ export class SlykTvService {
 
     /** M3U playlists, and Xtream accounts' live TV where it can be fetched. */
     playsHere(playlist: PlaylistMeta): boolean {
-        return this.isM3u(playlist) || (!!playlist.serverUrl && canFetchXtream());
+        return this.isM3u(playlist) || !!playlist.serverUrl;
     }
 
     /** Opens a source here; Stalker portals hand over to the classic UI. */
@@ -289,6 +295,7 @@ export class SlykTvService {
             return;
         }
         this.loadedPlaylistId = playlistId;
+        this.loadError.set(null);
         const request = ++this.loadRequest;
         this.bouquetId.set(BOUQUET_ALL);
         this.store.dispatch(ChannelActions.resetActiveChannel());
@@ -322,15 +329,20 @@ export class SlykTvService {
                     ),
                 })
             );
-        } catch {
+        } catch (error) {
             if (request === this.loadRequest) {
+                this.loadError.set(
+                    error instanceof Error && error.message
+                        ? error.message
+                        : 'The source could not be loaded.'
+                );
                 this.loadedPlaylistId = null;
                 this.store.dispatch(ChannelActions.setChannels({ channels: [] }));
             }
         }
     }
 
-    /** Xtream: live channels from the account's M3U export, guide from XMLTV. */
+    /** Xtream: live channels from the Xtream API, guide from its XMLTV. */
     private async loadXtream(
         account: Pick<
             PlaylistMeta,
@@ -338,13 +350,36 @@ export class SlykTvService {
         >,
         request: number
     ) {
-        const channels =
-            this.xtreamCache.get(account._id) ??
-            (await fetchXtreamLiveChannels(
-                account,
-                this.settingsStore.getTrustOptions()
-            ));
-        this.xtreamCache.set(account._id, channels);
+        const credentials: XtreamCredentials = {
+            serverUrl: account.serverUrl ?? '',
+            username: account.username ?? '',
+            password: account.password ?? '',
+        };
+        let channels = this.xtreamCache.get(account._id);
+        if (!channels) {
+            const [streams, categories, info] = await Promise.all([
+                this.xtreamApi.getLiveStreams(credentials),
+                this.xtreamApi.getCategories(credentials, 'live'),
+                this.xtreamApi.getAccountInfo(credentials).catch(() => null),
+            ]);
+            // The account's allowed formats keep the URL to one it serves.
+            credentials.allowedOutputFormats =
+                info?.user_info?.allowed_output_formats?.map((f) => f.trim());
+            // Receivers zap MPEG-TS, and some panels only serve real video
+            // as .ts (their .m3u8 answers with an error page), so Auto means
+            // ts here; an explicit HLS choice in settings is still honoured.
+            const format =
+                this.settingsStore.streamFormat?.() === StreamFormat.M3u8StreamFormat
+                    ? StreamFormat.M3u8StreamFormat
+                    : StreamFormat.TsStreamFormat;
+            channels = xtreamLiveChannels(streams, categories, (id) =>
+                this.xtreamUrls.constructLiveUrl(credentials, id, format)
+            );
+            if (channels.length === 0) {
+                throw new Error('The provider returned no live channels.');
+            }
+            this.xtreamCache.set(account._id, channels);
+        }
         if (request !== this.loadRequest) {
             return;
         }

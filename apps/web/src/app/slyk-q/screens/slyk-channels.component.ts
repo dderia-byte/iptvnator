@@ -95,14 +95,21 @@ export class SlykChannelsComponent implements SlykScreen {
     constructor() {
         inject(SlykNavService).register(this, inject(DestroyRef), 'pig');
         // A source just added from the Slyk screens arrives as ?open=<id>.
-        const opened = inject(ActivatedRoute).snapshot.queryParamMap.get('open');
+        const route = inject(ActivatedRoute);
+        const opened = route.snapshot.queryParamMap.get('open');
         if (opened) {
             const playlistId = opened;
             const stop = effect(() => {
                 if (this.tv.playlists().some((p) => p._id === playlistId)) {
                     untracked(() => {
                         if (this.tv.openPlaylistById(playlistId) === 'slyk') {
-                            void this.router.navigate([], { queryParams: {}, replaceUrl: true });
+                            // Drop ?open= but stay here: without relativeTo an
+                            // empty command list would navigate to the root.
+                            void this.router.navigate([], {
+                                relativeTo: route,
+                                queryParams: {},
+                                replaceUrl: true,
+                            });
                         }
                     });
                     stop.destroy();

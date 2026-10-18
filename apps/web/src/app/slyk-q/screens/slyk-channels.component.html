@@ -66,6 +66,8 @@
     <div class="empty slyk-abs">
         @if (tv.channelsLoading()) {
             Loading channels…
+        } @else if (tv.loadError()) {
+            Couldn't load this source: {{ tv.loadError() }}
         } @else if (tv.playlists().length === 0) {
             No playlists yet. Open Playlists in the main menu to add one.
         } @else {
