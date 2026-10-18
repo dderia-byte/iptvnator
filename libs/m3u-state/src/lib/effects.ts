@@ -523,6 +523,15 @@ export class PlaylistEffects {
     });
 
     private navigateToPlaylist(playlist: Playlist): void {
+        // Added from the Slyk Q TV interface: stay there and let it open the
+        // new source (it hands Stalker portals to the workspace itself).
+        if (this.router.url?.startsWith('/tv')) {
+            void this.router.navigate(['/tv', 'channels'], {
+                queryParams: { open: playlist._id },
+            });
+            return;
+        }
+
         if (playlist.serverUrl) {
             void this.router.navigate(['/workspace', 'xtreams', playlist._id]);
             return;

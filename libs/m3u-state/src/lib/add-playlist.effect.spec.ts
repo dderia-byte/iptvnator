@@ -28,6 +28,7 @@ describe('PlaylistEffects addPlaylist$', () => {
     let effects: PlaylistEffects;
     let writes: Map<string, Subject<Playlist>>;
     let navigated: string[];
+    let routerUrl: string;
 
     const playlist = (id: string): Playlist =>
         ({
@@ -72,8 +73,18 @@ describe('PlaylistEffects addPlaylist$', () => {
                 {
                     provide: Router,
                     useValue: {
-                        navigate: (commands: unknown[]) => {
-                            navigated.push(String(commands.at(-1)));
+                        get url() {
+                            return routerUrl;
+                        },
+                        navigate: (
+                            commands: unknown[],
+                            extras?: { queryParams?: { open?: string } }
+                        ) => {
+                            navigated.push(
+                                extras?.queryParams?.open
+                                    ? `${commands.join('/')}?open=${extras.queryParams.open}`
+                                    : String(commands.at(-1))
+                            );
                             return Promise.resolve(true);
                         },
                     },
@@ -92,6 +103,7 @@ describe('PlaylistEffects addPlaylist$', () => {
         actions$ = new Subject();
         writes = new Map();
         navigated = [];
+        routerUrl = '/workspace/sources';
         effects = createEffects();
         effects.addPlaylist$.subscribe();
     });
@@ -110,6 +122,17 @@ describe('PlaylistEffects addPlaylist$', () => {
 
     // The regression: under switchMap the second action unsubscribed the
     // first write, so 'first' never reached its navigation/EPG side effects.
+    it('stays in the Slyk Q TV interface when the add started there', () => {
+        routerUrl = '/tv/playlists';
+        const write = startWrite('tv');
+
+        actions$.next(PlaylistActions.addPlaylist({ playlist: playlist('tv') }));
+        write.next(playlist('tv'));
+        write.complete();
+
+        expect(navigated).toEqual(['/tv/channels?open=tv']);
+    });
+
     it('completes an in-flight add before starting the next one', () => {
         const firstWrite = startWrite('first');
         const secondWrite = startWrite('second');

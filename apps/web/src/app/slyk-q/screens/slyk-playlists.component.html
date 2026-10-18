@@ -4,7 +4,7 @@
 
 <!-- menu: 540,385 1002×697, itemHeight 78 -->
 <div class="slyk-rows" style="left: 540px; top: 384px; width: 1002px; height: 624px"></div>
-@if (selected()) {
+@if (selected() || index() === playlists().length) {
     <div
         class="slyk-selectbar"
         style="left: 540px; width: 1002px; height: 78px"
@@ -29,4 +29,19 @@
     </div>
 }
 
-<app-slyk-buttons [labels]="['', 'Add source', 'Manage sources']" />
+<!-- "+ Add playlist" row, as the first entry of the menu -->
+@if (playlists().length < 8) {
+    <div
+        class="row add slyk-abs"
+        role="button"
+        tabindex="-1"
+        [style.top.px]="385 + visible().length * 78"
+        (mouseenter)="index.set(playlists().length)"
+        (click)="add()"
+        (keydown.enter)="add()"
+    >
+        <span class="name">+ Add playlist…</span>
+    </div>
+}
+
+<app-slyk-buttons [labels]="['Add M3U link', 'Add Xtream Codes', 'Add M3U file', 'Manage sources']" />

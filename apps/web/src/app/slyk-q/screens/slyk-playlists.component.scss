@@ -26,3 +26,11 @@
         color: var(--slyk-bluetext);
     }
 }
+
+.row.add {
+    color: var(--slyk-bluetext);
+
+    &:hover {
+        background: var(--slyk-select);
+    }
+}

@@ -6,8 +6,9 @@ import {
     effect,
     inject,
     linkedSignal,
+    untracked,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Channel } from '@iptvnator/shared/interfaces';
 import {
     SlykButtonsComponent,
@@ -85,7 +86,7 @@ export class SlykChannelsComponent implements SlykScreen {
             : 'Add favourite';
     });
     readonly buttons = computed(() => [
-        this.favouriteLabel(),
+        this.tv.favouritesSupported() ? this.favouriteLabel() : '',
         'TV Guide',
         'Previous',
         'Next',
@@ -93,6 +94,21 @@ export class SlykChannelsComponent implements SlykScreen {
 
     constructor() {
         inject(SlykNavService).register(this, inject(DestroyRef), 'pig');
+        // A source just added from the Slyk screens arrives as ?open=<id>.
+        const opened = inject(ActivatedRoute).snapshot.queryParamMap.get('open');
+        if (opened) {
+            const playlistId = opened;
+            const stop = effect(() => {
+                if (this.tv.playlists().some((p) => p._id === playlistId)) {
+                    untracked(() => {
+                        if (this.tv.openPlaylistById(playlistId) === 'slyk') {
+                            void this.router.navigate([], { queryParams: {}, replaceUrl: true });
+                        }
+                    });
+                    stop.destroy();
+                }
+            });
+        }
         effect(() => void this.epg.load(this.visible()));
     }
 

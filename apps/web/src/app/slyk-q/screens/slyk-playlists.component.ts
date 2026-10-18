@@ -15,6 +15,10 @@ import {
 import { SlykKeyPress, wrapIndex } from '../slyk-keys';
 import { SlykNavService, SlykScreen } from '../slyk-nav.service';
 import { SlykTvService } from '../slyk-tv.service';
+import {
+    WORKSPACE_SHELL_ACTIONS,
+    WorkspacePlaylistType,
+} from '@iptvnator/workspace/shell/util';
 
 const ROWS = 8;
 
@@ -28,6 +32,7 @@ const ROWS = 8;
 })
 export class SlykPlaylistsComponent implements SlykScreen {
     private readonly router = inject(Router);
+    private readonly shellActions = inject(WORKSPACE_SHELL_ACTIONS);
     readonly tv = inject(SlykTvService);
 
     readonly playlists = this.tv.playlists;
@@ -49,7 +54,7 @@ export class SlykPlaylistsComponent implements SlykScreen {
     readonly description = computed(() => {
         const playlist = this.selected();
         if (!playlist) {
-            return 'No playlists yet. Press the green button to add an M3U playlist, Xtream Codes or Stalker portal.';
+            return 'No playlists yet. Red adds an M3U link, green an Xtream Codes account, yellow an M3U file.';
         }
         const kind = this.kindOf(playlist);
         const count = playlist.count ? `${playlist.count} channels` : '';
@@ -84,15 +89,28 @@ export class SlykPlaylistsComponent implements SlykScreen {
         switch (key) {
             case 'up':
             case 'down':
+                // One extra stop past the last source: "+ Add playlist…".
                 this.index.update((i) =>
-                    wrapIndex(i, key === 'up' ? -1 : 1, this.playlists().length)
+                    wrapIndex(i, key === 'up' ? -1 : 1, this.playlists().length + 1)
                 );
                 return true;
             case 'ok':
-                this.open(this.selected());
+                if (this.index() === this.playlists().length) {
+                    this.add();
+                } else {
+                    this.open(this.selected());
+                }
+                return true;
+            case 'red':
+                this.add('url');
                 return true;
             case 'green':
+                this.add('xtream');
+                return true;
             case 'yellow':
+                this.add('file');
+                return true;
+            case 'blue':
                 void this.router.navigateByUrl('/workspace/sources');
                 return true;
             default:
@@ -100,9 +118,16 @@ export class SlykPlaylistsComponent implements SlykScreen {
         }
     }
 
+    /** IPTVnator's Add playlist dialog, opened on the chosen method. */
+    add(type?: WorkspacePlaylistType): void {
+        this.shellActions.openAddPlaylistDialog(type);
+    }
+
     private kindOf(playlist: PlaylistMeta): string {
         if (playlist.serverUrl) {
-            return 'Xtream Codes (opens in Classic View)';
+            return this.tv.playsHere(playlist)
+                ? 'Xtream Codes · live TV here, films and series in Classic View'
+                : 'Xtream Codes (opens in Classic View)';
         }
         if (playlist.macAddress) {
             return 'Stalker portal (opens in Classic View)';

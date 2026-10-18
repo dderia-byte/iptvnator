@@ -12,6 +12,7 @@ import {
     selectChannelsLoading,
     selectFavorites,
 } from '@iptvnator/m3u-state';
+import { EpgService } from '@iptvnator/epg/data-access';
 import { createPlaybackSessionKey } from '@iptvnator/playback/util';
 import { PlaylistContextFacade } from '@iptvnator/playlist/shared/util';
 import { PlaylistsService, SettingsStore } from '@iptvnator/services';
@@ -27,6 +28,11 @@ import {
     ResolvedPortalPlayback,
     VideoPlayer,
 } from '@iptvnator/shared/interfaces';
+import {
+    canFetchXtream,
+    fetchXtreamLiveChannels,
+    xtreamXmltvUrl,
+} from './slyk-xtream';
 
 /** A Slyk "bouquet": all channels, favourites, or one playlist group. */
 export interface SlykBouquet {
@@ -61,6 +67,15 @@ export class SlykTvService {
         selectActivePlaybackUrl
     );
 
+    /**
+     * Favourites live on M3U playlists; an Xtream account keeps its own in
+     * the classic workspace, so the receiver does not write to it.
+     */
+    readonly favouritesSupported = computed(
+        () => !this.activePlaylist()?.serverUrl
+    );
+    private readonly epgService = inject(EpgService);
+    private readonly xtreamCache = new Map<string, Channel[]>();
     private loadedPlaylistId: string | null = null;
     private loadRequest = 0;
 
@@ -169,7 +184,9 @@ export class SlykTvService {
     }
 
     toggleFavourite(channel: Channel): void {
-        this.store.dispatch(FavoritesActions.updateFavorites({ channel }));
+        if (this.favouritesSupported()) {
+            this.store.dispatch(FavoritesActions.updateFavorites({ channel }));
+        }
     }
 
     setBouquet(id: string): void {
@@ -232,9 +249,14 @@ export class SlykTvService {
         return this.playlistContext.getProviderForPlaylist(playlist) === 'playlists';
     }
 
-    /** Opens a source: M3U loads here, portals hand over to the classic UI. */
+    /** M3U playlists, and Xtream accounts' live TV where it can be fetched. */
+    playsHere(playlist: PlaylistMeta): boolean {
+        return this.isM3u(playlist) || (!!playlist.serverUrl && canFetchXtream());
+    }
+
+    /** Opens a source here; Stalker portals hand over to the classic UI. */
     openPlaylist(playlist: PlaylistMeta): 'slyk' | 'classic' {
-        if (!this.isM3u(playlist)) {
+        if (!this.playsHere(playlist)) {
             this.playlistContext.selectPlaylist(playlist);
             return 'classic';
         }
@@ -243,13 +265,18 @@ export class SlykTvService {
         return 'slyk';
     }
 
-    /** Loads the remembered (or first) M3U playlist when nothing is loaded. */
+    openPlaylistById(id: string): 'slyk' | 'classic' | null {
+        const playlist = this.playlists().find((p) => p._id === id);
+        return playlist ? this.openPlaylist(playlist) : null;
+    }
+
+    /** Loads the remembered (or first) playable source when nothing is loaded. */
     async ensureLoaded(): Promise<void> {
         const active = this.activePlaylist();
         const candidate =
-            active && this.isM3u(active)
+            active && this.playsHere(active)
                 ? active
-                : this.playlists().find((p) => this.isM3u(p));
+                : this.playlists().find((p) => this.playsHere(p));
         if (candidate && this.loadedPlaylistId !== candidate._id) {
             this.playlistContext.activatePlaylist(candidate._id);
             await this.loadPlaylist(candidate._id);
@@ -273,6 +300,13 @@ export class SlykTvService {
             if (request !== this.loadRequest) {
                 return;
             }
+            if (playlist.serverUrl) {
+                await this.loadXtream(
+                    { ...playlist, _id: playlistId, title: playlist.title ?? '' },
+                    request
+                );
+                return;
+            }
             void window.electron
                 ?.setUserAgent(playlist.userAgent, playlist.referrer)
                 .catch(() => undefined);
@@ -294,6 +328,29 @@ export class SlykTvService {
                 this.store.dispatch(ChannelActions.setChannels({ channels: [] }));
             }
         }
+    }
+
+    /** Xtream: live channels from the account's M3U export, guide from XMLTV. */
+    private async loadXtream(
+        account: Pick<
+            PlaylistMeta,
+            '_id' | 'title' | 'serverUrl' | 'username' | 'password'
+        >,
+        request: number
+    ) {
+        const channels =
+            this.xtreamCache.get(account._id) ??
+            (await fetchXtreamLiveChannels(
+                account,
+                this.settingsStore.getTrustOptions()
+            ));
+        this.xtreamCache.set(account._id, channels);
+        if (request !== this.loadRequest) {
+            return;
+        }
+        this.store.dispatch(ChannelActions.setChannels({ channels }));
+        this.store.dispatch(FavoritesActions.hydrateFavorites({ channelIds: [] }));
+        void this.epgService.fetchEpg([xtreamXmltvUrl(account)]);
     }
 
     private resolvePlayback(): ResolvedPortalPlayback | null {

@@ -94,7 +94,7 @@ export class SlykShellComponent implements OnInit {
 
     @HostListener('document:keydown', ['$event'])
     onKeydown(event: KeyboardEvent): void {
-        if (event.defaultPrevented || isTypingInInput(event)) {
+        if (event.defaultPrevented || isTypingInInput(event) || dialogOpen()) {
             return;
         }
         const press = toSlykKey(event);
@@ -123,6 +123,9 @@ export class SlykShellComponent implements OnInit {
 
     /** Wheel = up/down (shift: left/right), throttled to one step per notch. */
     onWheel(event: WheelEvent): void {
+        if (dialogOpen()) {
+            return;
+        }
         event.preventDefault();
         const now = Date.now();
         if (now - this.lastWheel < WHEEL_STEP_MS) {
@@ -138,6 +141,9 @@ export class SlykShellComponent implements OnInit {
 
     /** Right click is the remote's Back / Exit, as in media-centre UIs. */
     onContextMenu(event: MouseEvent): void {
+        if (dialogOpen()) {
+            return;
+        }
         event.preventDefault();
         this.nav.press('back');
     }
@@ -159,6 +165,11 @@ export class SlykShellComponent implements OnInit {
                 return false;
         }
     }
+}
+
+/** A Material dialog (e.g. Add playlist) is open over the receiver. */
+function dialogOpen(): boolean {
+    return !!document.querySelector('.cdk-overlay-container .mat-mdc-dialog-container');
 }
 
 function readStoredVolume(): number {
