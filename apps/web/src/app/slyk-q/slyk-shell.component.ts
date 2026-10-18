@@ -182,8 +182,14 @@ export class SlykShellComponent implements OnInit {
                 void this.router.navigate(['/tv/guide']);
                 return true;
             case 'tv':
-            case 'back':
                 void this.router.navigate(['/tv/watch']);
+                return true;
+            case 'back':
+                // Back from a menu screen: to live TV when a channel is on,
+                // otherwise to the main menu (live TV would bounce back here).
+                void this.router.navigate(
+                    this.tv.activeChannel() ? ['/tv/watch'] : ['/tv']
+                );
                 return true;
             default:
                 return false;

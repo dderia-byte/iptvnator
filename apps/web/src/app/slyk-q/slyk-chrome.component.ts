@@ -114,6 +114,15 @@ export class SlykTemplateComponent {
             [style.left.px]="full() ? 0 : 490"
             [style.width.px]="full() ? 1920 : 1430"
         ></div>
+        <div
+            class="slyk-key slyk-abs back"
+            role="button"
+            tabindex="-1"
+            (click)="nav.press('back')"
+            (keydown.enter)="nav.press('back')"
+        >
+            <span class="label">‹ Back</span>
+        </div>
         @for (key of keys; track key.colour; let i = $index) {
             @if (labels()[i]) {
                 <div
@@ -145,6 +154,12 @@ export class SlykTemplateComponent {
             align-items: center;
             gap: 7px;
             font-size: 30px;
+        }
+        .back {
+            left: 1745px;
+            padding: 0 14px;
+            border: 1px solid rgb(255 255 255 / 45%);
+            border-radius: 4px;
         }
         .dot {
             width: 30px;
