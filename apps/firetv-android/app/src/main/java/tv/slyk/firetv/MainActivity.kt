@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         )
         setContentView(root)
 
-        player = NativePlayer(this, playerView)
+        player = NativePlayer(this, playerView, webView.settings.userAgentString)
         backend = SlykBackend(this, webView)
         webView.addJavascriptInterface(Bridge(), "SlykNative")
         webView.webViewClient = object : WebViewClient() {

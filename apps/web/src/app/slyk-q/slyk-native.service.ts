@@ -83,7 +83,15 @@ export class SlykNativeService {
         if (!bridge) {
             return;
         }
-        document.body.classList.add('slyk-native-host');
+        // The page must be see-through down to the canvas, whatever the app
+        // theme: the dark theme's body colour and color-scheme (which paints
+        // a dark canvas) would otherwise cover the picture. Inline
+        // !important outranks the theme's selectors.
+        for (const element of [document.documentElement, document.body]) {
+            element.classList.add('slyk-native-host');
+            element.style.setProperty('background', 'transparent', 'important');
+            element.style.setProperty('color-scheme', 'normal', 'important');
+        }
         effect(() => {
             const playback = this.tv.playback();
             untracked(() =>

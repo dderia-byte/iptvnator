@@ -3,6 +3,7 @@ package tv.slyk.firetv
 import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
@@ -24,7 +25,12 @@ import kotlin.math.roundToInt
  * play and where the picture goes (the full screen or a PiG frame).
  */
 @OptIn(UnstableApi::class)
-class NativePlayer(context: Context, private val view: PlayerView) {
+class NativePlayer(
+    private val context: Context,
+    private val view: PlayerView,
+    /** The WebView's browser user agent: some panels refuse okhttp's. */
+    private val defaultUserAgent: String
+) {
     private val http = OkHttpClient.Builder().followRedirects(true).build()
     private val dataSource = OkHttpDataSource.Factory(http)
     private val exo: ExoPlayer = ExoPlayer.Builder(
@@ -45,7 +51,14 @@ class NativePlayer(context: Context, private val view: PlayerView) {
                 if (retries++ < 3 && currentUrl != null) {
                     exo.prepare()
                     exo.play()
+                    return
                 }
+                Toast.makeText(
+                    context,
+                    "Channel failed to play: ${error.errorCodeName}" +
+                        (error.cause?.message?.let { " ($it)" } ?: ""),
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -66,7 +79,7 @@ class NativePlayer(context: Context, private val view: PlayerView) {
         request.optJSONObject("headers")?.let { json ->
             json.keys().forEach { name -> headers[name] = json.getString(name) }
         }
-        headers["User-Agent"]?.let { dataSource.setUserAgent(it) }
+        dataSource.setUserAgent(headers["User-Agent"] ?: defaultUserAgent)
         dataSource.setDefaultRequestProperties(headers - "User-Agent")
 
         val item = MediaItem.Builder().setUri(url)
