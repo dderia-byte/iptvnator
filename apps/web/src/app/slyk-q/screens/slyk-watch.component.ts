@@ -20,6 +20,8 @@ import { SlykMiniGuideComponent } from './slyk-mini-guide.component';
 /** Enigma2's default infobar timeout. */
 const INFOBAR_TIMEOUT_MS = 5000;
 const NUMBER_ZAP_TIMEOUT_MS = 2500;
+/** Large Xtream line-ups run past 10,000 services. */
+const MAX_DIGITS = 5;
 
 /** Live TV: Slyk Q `InfoBar`, `NumberZap` and the mini guide over video. */
 @Component({
@@ -150,10 +152,10 @@ export class SlykWatchComponent implements SlykScreen {
     }
 
     private typeDigit(digit: number): void {
-        const entry = (this.numberEntry() + digit).slice(-4);
+        const entry = (this.numberEntry() + digit).slice(-MAX_DIGITS);
         this.numberEntry.set(entry);
         clearTimeout(this.numberTimer);
-        if (entry.length >= 4) {
+        if (entry.length >= MAX_DIGITS) {
             this.commitNumber();
             return;
         }

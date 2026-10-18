@@ -154,13 +154,19 @@ export class SlykTvService {
         { equal: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
     );
 
-    readonly playerOverride = computed<VideoPlayer | null>(() =>
-        isDashChannel(this.activeChannel())
-            ? this.settingsStore.player() === VideoPlayer.ArtPlayer
+    readonly playerOverride = computed<VideoPlayer | null>(() => {
+        const selected = this.settingsStore.player();
+        if (isDashChannel(this.activeChannel())) {
+            return selected === VideoPlayer.ArtPlayer
                 ? VideoPlayer.ArtPlayer
-                : VideoPlayer.Html5Player
-            : null
-    );
+                : VideoPlayer.Html5Player;
+        }
+        // External players open their own window; the receiver keeps the
+        // picture in the app and falls back to Video.js for them.
+        return selected === VideoPlayer.MPV || selected === VideoPlayer.VLC
+            ? VideoPlayer.VideoJs
+            : null;
+    });
 
     displayName(channel: Channel | null | undefined): string {
         if (!channel) {
@@ -223,7 +229,13 @@ export class SlykTvService {
 
     play(channel: Channel): void {
         this.store.dispatch(
-            ChannelActions.setActiveChannel({ channel, startPlayback: true })
+            // The receiver always plays in its own picture; MPV/VLC stay
+            // a Classic View choice.
+            ChannelActions.setActiveChannel({
+                channel,
+                startPlayback: true,
+                inAppOnly: true,
+            })
         );
     }
 

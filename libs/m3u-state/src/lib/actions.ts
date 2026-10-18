@@ -61,6 +61,8 @@ export const ChannelActions = createActionGroup({
         'Set Active Channel': props<{
             channel: Channel;
             startPlayback?: boolean;
+            /** Play in the app's own player even when MPV/VLC is selected. */
+            inAppOnly?: boolean;
         }>(),
         'Set Active Channel Success': props<{ channel: Channel }>(),
         'Reset Active Channel': emptyProps(),

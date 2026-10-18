@@ -62,7 +62,7 @@ export class SlykSetupComponent implements SlykScreen {
             label: 'Video player',
             key: 'player',
             choices: this.playerChoices(),
-            description: 'Player used for live channels. External players open in their own window.',
+            description: 'Player used for live channels in this interface. External MPV/VLC stay available in Classic View settings.',
         },
         {
             label: 'EPG time offset',
@@ -191,12 +191,6 @@ export class SlykSetupComponent implements SlykScreen {
         const choices = [...PLAYERS];
         if (this.runtime.supportsEmbeddedMpv) {
             choices.push({ value: VideoPlayer.EmbeddedMpv, label: 'Embedded MPV' });
-        }
-        if (this.runtime.supportsManagedExternalPlayers) {
-            choices.push(
-                { value: VideoPlayer.MPV, label: 'MPV (external)' },
-                { value: VideoPlayer.VLC, label: 'VLC (external)' }
-            );
         }
         return choices;
     }

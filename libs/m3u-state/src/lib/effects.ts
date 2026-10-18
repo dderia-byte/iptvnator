@@ -235,7 +235,7 @@ export class PlaylistEffects {
                             channel.url,
                             activePlaylist
                         );
-                        if (!payload) {
+                        if (!payload || action.inAppOnly) {
                             return;
                         }
 
