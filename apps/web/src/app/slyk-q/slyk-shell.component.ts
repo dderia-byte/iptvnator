@@ -16,6 +16,7 @@ import { SettingsStore } from '@iptvnator/services';
 import { SlykEpgService } from './slyk-epg.service';
 import { SlykKey, toSlykKey } from './slyk-keys';
 import { SlykNavService } from './slyk-nav.service';
+import { SlykCategoriesService } from './slyk-categories.service';
 import { SlykNativeService } from './slyk-native.service';
 import { SlykPlayerService } from './slyk-player.service';
 import { SlykTvService } from './slyk-tv.service';
@@ -40,6 +41,7 @@ const WHEEL_STEP_MS = 120;
         SlykNavService,
         SlykPlayerService,
         SlykNativeService,
+        SlykCategoriesService,
     ],
     templateUrl: './slyk-shell.component.html',
     styleUrls: ['./slyk-shell.component.scss'],
@@ -179,7 +181,8 @@ export class SlykShellComponent implements OnInit {
                 void this.router.navigate(['/tv']);
                 return true;
             case 'epg':
-                void this.router.navigate(['/tv/guide']);
+                // Sky: the Guide button opens the category list first.
+                void this.router.navigate(['/tv/guide-menu']);
                 return true;
             case 'tv':
                 void this.router.navigate(['/tv/watch']);

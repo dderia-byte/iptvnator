@@ -61,11 +61,12 @@ export class SlykGuideComponent implements SlykScreen {
     readonly playingName = computed(() =>
         this.tv.displayName(this.tv.activeChannel())
     );
-    readonly buttons = ['Bouquet', 'Watch', '-24 hrs', '+24 hrs'];
+    readonly buttons = ['Categories', 'Watch', '-24 hrs', '+24 hrs'];
 
     constructor() {
         inject(SlykNavService).register(this, inject(DestroyRef), 'guide');
-        this.tv.showBouquetWithActive();
+        // Opens on the category chosen in the guide menu; the cursor starts
+        // on the playing channel when that category lists it.
         this.guide.focus(this.tv.activeChannel());
     }
 
@@ -107,13 +108,15 @@ export class SlykGuideComponent implements SlykScreen {
                 this.activate();
                 return true;
             case 'red':
-                this.tv.stepBouquet(1);
-                this.guide.channelIndex.set(0);
+                void this.router.navigateByUrl('/tv/guide-menu');
                 return true;
             case 'green':
                 void this.router.navigateByUrl('/tv/watch');
                 return true;
             case 'epg':
+            case 'back':
+                // Back steps out to the category list, as on Sky.
+                void this.router.navigateByUrl('/tv/guide-menu');
                 return true;
             default:
                 return false;

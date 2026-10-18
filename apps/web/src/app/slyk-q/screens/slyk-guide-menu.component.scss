@@ -1,0 +1,52 @@
+.description {
+    left: 540px;
+    top: 140px;
+    width: 1002px;
+    height: 195px;
+    overflow: hidden;
+}
+
+.row {
+    left: 540px;
+    width: 1002px;
+    height: 78px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 0 15px;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    .name {
+        flex: 1;
+    }
+
+    .count {
+        color: var(--slyk-bluetext);
+    }
+}
+
+.pager {
+    left: 1560px;
+    top: 950px;
+    width: 300px;
+    height: 40px;
+    font-size: 26px;
+    color: var(--slyk-bluetext);
+}
+
+.region {
+    left: 540px;
+    top: 334px;
+    width: 1380px;
+    height: 36px;
+    line-height: 36px;
+
+    .arrow {
+        display: inline-block;
+        padding: 0 12px;
+        color: var(--slyk-bluetext);
+        cursor: pointer;
+    }
+}

@@ -32,6 +32,11 @@ import {
     XtreamCredentials,
     XtreamUrlService,
 } from '@iptvnator/portal/xtream/data-access';
+import {
+    GENRE_PREFIX,
+    REGION_ALL,
+    SlykCategoriesService,
+} from './slyk-categories.service';
 import { xtreamLiveChannels, xtreamXmltvUrl } from './slyk-xtream';
 
 /** A Slyk "bouquet": all channels, favourites, or one playlist group. */
@@ -56,6 +61,7 @@ export class SlykTvService {
     private readonly playlistContext = inject(PlaylistContextFacade);
     private readonly playlistsService = inject(PlaylistsService);
     private readonly settingsStore = inject(SettingsStore);
+    readonly categories = inject(SlykCategoriesService);
 
     readonly playlists = this.playlistContext.playlists;
     readonly activePlaylist = this.store.selectSignal(selectActivePlaylist);
@@ -103,6 +109,8 @@ export class SlykTvService {
         return [
             { id: BOUQUET_ALL, label: 'All Channels' },
             { id: BOUQUET_FAVOURITES, label: 'Favourites' },
+            { id: GENRE_PREFIX + REGION_ALL, label: 'All Channels' },
+            ...this.categories.genres().map(({ id, label }) => ({ id, label })),
             ...groups,
         ];
     });
@@ -120,6 +128,16 @@ export class SlykTvService {
         if (id === BOUQUET_FAVOURITES) {
             const keys = new Set(this.favouriteKeys());
             return channels.filter((c) => keys.has(c.url) || keys.has(c.id));
+        }
+        if (id.startsWith(GENRE_PREFIX)) {
+            const genre = id.slice(GENRE_PREFIX.length);
+            if (genre === REGION_ALL) {
+                return channels.filter((c) => this.categories.inRegion(c));
+            }
+            const genres = this.categories.genreOf();
+            return channels.filter(
+                (c) => genres.get(c) === genre && this.categories.inRegion(c)
+            );
         }
         if (id.startsWith(GROUP_PREFIX)) {
             const title = id.slice(GROUP_PREFIX.length);

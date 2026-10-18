@@ -40,7 +40,7 @@ export class SlykHomeComponent implements SlykScreen {
     readonly epg = inject(SlykEpgService);
 
     readonly items: MenuItem[] = [
-        { label: 'TV Guide', action: () => this.go('/tv/guide') },
+        { label: 'TV Guide', action: () => this.go('/tv/guide-menu') },
         { label: 'Channels', action: () => this.go('/tv/channels') },
         { label: 'Favourites', action: () => this.openFavourites() },
         { label: 'Playlists', action: () => this.go('/tv/playlists') },

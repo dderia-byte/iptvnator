@@ -1,0 +1,65 @@
+<app-slyk-template [title]="title()" />
+
+<div class="description slyk-abs">{{ description() }}</div>
+
+@if (mode() === 'categories' && hasRegions()) {
+    <!-- region bar on the TimeLineBG strip above the list -->
+    <div class="slyk-timeline-bar" style="left: 491px; top: 323px; width: 1430px; height: 62px"></div>
+    <div class="region slyk-abs slyk-bold">
+        <span
+            class="arrow"
+            role="button"
+            tabindex="-1"
+            aria-label="Previous region"
+            (click)="tv.categories.stepRegion(-1)"
+            (keydown.enter)="tv.categories.stepRegion(-1)"
+            >‹</span
+        >
+        Region: {{ regionLabel() }}
+        <span
+            class="arrow"
+            role="button"
+            tabindex="-1"
+            aria-label="Next region"
+            (click)="tv.categories.stepRegion(1)"
+            (keydown.enter)="tv.categories.stepRegion(1)"
+            >›</span
+        >
+    </div>
+}
+
+<!-- menu-2panel list: 540,385 1002 wide, itemHeight 78 -->
+<div class="slyk-rows" style="left: 540px; top: 384px; width: 1002px; height: 624px"></div>
+@if (visible().length) {
+    <div
+        class="slyk-selectbar"
+        style="left: 540px; width: 1002px; height: 78px"
+        [style.top.px]="385 + (index() - pageStart()) * 78"
+    ></div>
+}
+@for (row of visible(); track row.id; let i = $index) {
+    <div
+        class="row slyk-abs"
+        role="option"
+        tabindex="-1"
+        [attr.aria-selected]="pageStart() + i === index()"
+        [style.top.px]="385 + i * 78"
+        (mouseenter)="index.set(pageStart() + i)"
+        (click)="choose(pageStart() + i)"
+        (keydown.enter)="choose(pageStart() + i)"
+    >
+        <span class="name slyk-nowrap">{{ row.label }}</span>
+        @if (row.count !== null) {
+            <span class="count">{{ row.count.toLocaleString() }}</span>
+        } @else {
+            <span class="count">›</span>
+        }
+    </div>
+}
+@if (rows().length > 8) {
+    <div class="pager slyk-abs">
+        Page {{ page() }} of {{ pageCount() }}
+    </div>
+}
+
+<app-slyk-buttons [labels]="buttons()" />

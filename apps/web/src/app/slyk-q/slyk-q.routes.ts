@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { SlykChannelsComponent } from './screens/slyk-channels.component';
 import { SlykGuideComponent } from './screens/slyk-guide.component';
+import { SlykGuideMenuComponent } from './screens/slyk-guide-menu.component';
 import { SlykHomeComponent } from './screens/slyk-home.component';
 import { SlykPlaylistsComponent } from './screens/slyk-playlists.component';
 import { SlykSetupComponent } from './screens/slyk-setup.component';
@@ -17,6 +18,7 @@ export const SLYK_Q_ROUTES: Routes = [
             { path: 'watch', component: SlykWatchComponent },
             { path: 'channels', component: SlykChannelsComponent },
             { path: 'guide', component: SlykGuideComponent },
+            { path: 'guide-menu', component: SlykGuideMenuComponent },
             { path: 'playlists', component: SlykPlaylistsComponent },
             { path: 'settings', component: SlykSetupComponent },
         ],
