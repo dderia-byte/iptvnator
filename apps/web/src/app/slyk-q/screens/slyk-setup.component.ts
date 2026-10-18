@@ -62,7 +62,7 @@ export class SlykSetupComponent implements SlykScreen {
             label: 'Video player',
             key: 'player',
             choices: this.playerChoices(),
-            description: 'Player used for live channels in this interface. External MPV/VLC stay available in Classic View settings.',
+            description: 'Player used for live channels when 4K and Dolby playback (Embedded MPV) is off. With it on, Embedded MPV plays every channel. External MPV/VLC stay in Classic View settings.',
         },
         {
             label: 'EPG time offset',

@@ -22,5 +22,17 @@
             </div>
         }
         <router-outlet />
+        @if (players.restartNotice()) {
+            <!-- Slyk Q MessageBox: title-blue box, centred -->
+            <div class="slyk-message" role="alertdialog" aria-labelledby="slyk-message-text">
+                <div id="slyk-message-text">
+                    4K and Dolby playback is now set up. Close and reopen IPTVnator
+                    once to switch it on.
+                </div>
+                <button type="button" class="slyk-message-ok" (click)="players.dismissRestartNotice()">
+                    OK
+                </button>
+            </div>
+        }
     </div>
 </div>

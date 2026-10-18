@@ -16,6 +16,7 @@ import { SettingsStore } from '@iptvnator/services';
 import { SlykEpgService } from './slyk-epg.service';
 import { SlykKey, toSlykKey } from './slyk-keys';
 import { SlykNavService } from './slyk-nav.service';
+import { SlykPlayerService } from './slyk-player.service';
 import { SlykTvService } from './slyk-tv.service';
 
 const STAGE_WIDTH = 1920;
@@ -32,7 +33,7 @@ const WHEEL_STEP_MS = 120;
 @Component({
     selector: 'app-slyk-shell',
     imports: [RouterOutlet, WebPlayerViewComponent],
-    providers: [SlykTvService, SlykEpgService, SlykNavService],
+    providers: [SlykTvService, SlykEpgService, SlykNavService, SlykPlayerService],
     templateUrl: './slyk-shell.component.html',
     styleUrls: ['./slyk-shell.component.scss'],
     encapsulation: ViewEncapsulation.None,
@@ -56,8 +57,12 @@ export class SlykShellComponent implements OnInit {
     private lastWheel = 0;
     private lastPointerX = -1;
     private lastPointerY = -1;
+    readonly players = inject(SlykPlayerService);
     readonly player = computed(
-        () => this.tv.playerOverride() ?? this.settingsStore.player() ?? null
+        () =>
+            this.players.playerFor(this.tv.activeChannel()) ??
+            this.settingsStore.player() ??
+            null
     );
 
     constructor() {
@@ -99,6 +104,11 @@ export class SlykShellComponent implements OnInit {
         }
         const press = toSlykKey(event);
         if (!press) {
+            return;
+        }
+        if (this.players.restartNotice() && (press.key === 'ok' || press.key === 'back')) {
+            this.players.dismissRestartNotice();
+            event.preventDefault();
             return;
         }
         if (this.nav.dispatch(press)) {

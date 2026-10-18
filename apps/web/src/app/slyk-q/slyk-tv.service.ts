@@ -19,7 +19,6 @@ import { PlaylistsService, SettingsStore } from '@iptvnator/services';
 import {
     applyChannelNameStrip,
     extractDrmFromRaw,
-    isDashChannel,
     isLikelyM3uVod,
 } from '@iptvnator/shared/m3u-utils';
 import {
@@ -27,7 +26,6 @@ import {
     PlaylistMeta,
     ResolvedPortalPlayback,
     StreamFormat,
-    VideoPlayer,
 } from '@iptvnator/shared/interfaces';
 import {
     XtreamApiService,
@@ -153,20 +151,6 @@ export class SlykTvService {
         () => this.resolvePlayback(),
         { equal: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
     );
-
-    readonly playerOverride = computed<VideoPlayer | null>(() => {
-        const selected = this.settingsStore.player();
-        if (isDashChannel(this.activeChannel())) {
-            return selected === VideoPlayer.ArtPlayer
-                ? VideoPlayer.ArtPlayer
-                : VideoPlayer.Html5Player;
-        }
-        // External players open their own window; the receiver keeps the
-        // picture in the app and falls back to Video.js for them.
-        return selected === VideoPlayer.MPV || selected === VideoPlayer.VLC
-            ? VideoPlayer.VideoJs
-            : null;
-    });
 
     displayName(channel: Channel | null | undefined): string {
         if (!channel) {
