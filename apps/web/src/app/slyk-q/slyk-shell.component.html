@@ -1,0 +1,21 @@
+<div class="slyk-viewport">
+    <div class="slyk-stage" [style.transform]="stageTransform()">
+        @if (tv.playback(); as playback) {
+            <div
+                class="slyk-player"
+                [class]="'slyk-player slyk-player--' + nav.frame()"
+                data-player-shortcuts-suspended
+            >
+                <app-web-player-view
+                    [playbackSessionKey]="tv.playbackSessionKey()"
+                    [streamUrl]="playback.streamUrl"
+                    [title]="playback.title"
+                    [playback]="playback"
+                    [playerOverride]="player()"
+                    [volume]="volume()"
+                />
+            </div>
+        }
+        <router-outlet />
+    </div>
+</div>

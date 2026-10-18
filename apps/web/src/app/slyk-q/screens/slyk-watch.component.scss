@@ -1,0 +1,134 @@
+// infobar1.png recreated: light rail at the top, dark glass with grey
+// vignetted ends, and the framed centre panel with its two flares.
+.ib-glass {
+    left: 0;
+    top: 724px;
+    width: 1920px;
+    height: 356px;
+    z-index: 2;
+    background:
+        linear-gradient(180deg, transparent 0 24px, rgb(225 225 225 / 85%) 24px 26px, rgb(140 140 140 / 55%) 26px 32px, transparent 34px),
+        linear-gradient(180deg, transparent 0 34px, rgb(0 0 0 / 30%) 36px),
+        radial-gradient(ellipse 62% 140% at 50% 55%, rgb(18 18 18 / 94%) 55%, rgb(70 70 70 / 80%) 82%, rgb(170 170 170 / 60%) 100%) 0 34px / 100% calc(100% - 34px) no-repeat;
+}
+
+.ib-panel {
+    left: 432px;
+    top: 766px;
+    width: 1136px;
+    height: 262px;
+    z-index: 2;
+    box-sizing: border-box;
+    border: 1px solid rgb(255 255 255 / 22%);
+    background:
+        radial-gradient(ellipse 70px 3px at 50% 0, rgb(255 255 255 / 95%), transparent),
+        radial-gradient(ellipse 70px 3px at 50% 100%, rgb(255 255 255 / 95%), transparent),
+        linear-gradient(180deg, rgb(255 255 255 / 4%), transparent 30%);
+}
+
+.ib-date {
+    left: 18px;
+    top: 995px;
+    width: 396px;
+    height: 42px;
+    color: var(--slyk-grey);
+    text-align: right;
+}
+
+// up-arrow.png / down-arrow.png: open white chevrons.
+.ib-arrow {
+    left: 368px;
+    width: 22px;
+    height: 22px;
+    border-left: 4px solid #fff;
+    border-top: 4px solid #fff;
+    box-sizing: border-box;
+
+    &.up {
+        top: 838px;
+        transform: rotate(45deg);
+    }
+
+    &.down {
+        top: 932px;
+        transform: rotate(225deg);
+    }
+}
+
+.ib-channel {
+    left: 18px;
+    top: 852px;
+    width: 396px;
+    height: 81px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.ib-start {
+    left: 447px;
+    top: 984px;
+    width: 135px;
+    height: 42px;
+}
+
+.ib-name {
+    left: 806px;
+    top: 779px;
+    width: 600px;
+    height: 42px;
+}
+
+.ib-desc {
+    left: 806px;
+    top: 822px;
+    width: 762px;
+    height: 189px;
+    overflow: hidden;
+}
+
+.ib-next {
+    left: 1590px;
+    top: 779px;
+    width: 312px;
+    height: 122px;
+    overflow: hidden;
+}
+
+.ib-next-start {
+    left: 1590px;
+    top: 984px;
+    width: 279px;
+    height: 42px;
+}
+
+.numberzap {
+    left: 54px;
+    top: 783px;
+    width: 540px;
+    height: 270px;
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 12%), transparent 30%),
+        rgb(0 0 0 / 70%);
+    border: 1px solid rgb(255 255 255 / 25%);
+
+    .nz-name {
+        position: absolute;
+        left: 57px;
+        top: 87px;
+        width: 317px;
+        height: 150px;
+        overflow: hidden;
+    }
+
+    .nz-number {
+        position: absolute;
+        left: 374px;
+        top: 95px;
+        width: 110px;
+        height: 45px;
+        font-size: 42px;
+        line-height: 45px;
+        text-align: right;
+    }
+}

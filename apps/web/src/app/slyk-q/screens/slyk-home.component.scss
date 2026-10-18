@@ -1,0 +1,85 @@
+.menu {
+    left: 90px;
+    top: 545px;
+    width: 364px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    z-index: 3;
+
+    li {
+        height: 78px;
+        padding-left: 15px;
+        line-height: 78px;
+        cursor: pointer;
+    }
+}
+
+// 1-panel-gradient.png: the list fades out into the bottom edge.
+.nav-gradient {
+    left: 90px;
+    top: 1015px;
+    width: 364px;
+    height: 65px;
+    z-index: 10;
+    background: linear-gradient(180deg, transparent, rgb(1 76 154 / 85%) 70%, var(--slyk-botmid));
+    pointer-events: none;
+}
+
+.picks-title {
+    left: 542px;
+    top: 322px;
+    width: 1000px;
+    height: 48px;
+    font-size: 42px;
+    line-height: 48px;
+}
+
+// q-toppicks/tile-bg.png: dark frame, 6px border, poster 240×320 inside.
+.tile {
+    width: 252px;
+    height: 332px;
+    padding: 5px 6px 7px;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, rgb(0 0 0 / 35%), rgb(0 0 0 / 55%));
+    border: 1px solid rgb(255 255 255 / 10%);
+    cursor: pointer;
+
+    &.focused {
+        outline: 4px solid #fff;
+        outline-offset: 0;
+        box-shadow: 0 0 18px rgb(255 255 255 / 45%);
+    }
+}
+
+.poster {
+    position: relative;
+    width: 240px;
+    height: 320px;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 18%), transparent 70%),
+        linear-gradient(160deg, var(--slyk-topright), var(--slyk-botleft));
+
+    .logo {
+        left: 20px;
+        top: 40px;
+        width: 200px;
+        height: 150px;
+    }
+
+    .caption {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 40px 12px 12px;
+        background: linear-gradient(180deg, transparent, rgb(0 0 0 / 75%) 45%);
+        font-size: 24px;
+    }
+
+    .now {
+        color: var(--slyk-bluetext);
+        font-size: 22px;
+    }
+}

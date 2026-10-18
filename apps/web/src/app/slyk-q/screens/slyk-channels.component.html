@@ -1,0 +1,69 @@
+<app-slyk-template />
+
+<!-- ServiceEvent of the highlighted service -->
+<div class="now-name slyk-abs slyk-bold slyk-nowrap">
+    {{ info().now?.title || (selected() ? 'No event information' : '') }}
+</div>
+<div class="now-desc slyk-abs">{{ info().now?.description }}</div>
+<div class="divider slyk-abs"></div>
+@if (selected()) {
+    <app-slyk-picon
+        style="left: 1475px; top: 38px; width: 150px; height: 90px"
+        [channel]="selected()"
+        [name]="selectedName()"
+    />
+    <div class="meta slyk-abs" style="top: 140px">{{ length() }}</div>
+    <div class="meta slyk-abs" style="top: 177px">{{ startedAt() }}</div>
+    <div class="slyk-badge" style="left: 1635px; top: 146px">{{ badge() }}</div>
+}
+
+<!-- next / later in the left column -->
+@if (info().next; as next) {
+    <div class="side-name slyk-abs slyk-bold slyk-nowrap" style="top: 415px">
+        {{ next.title }}
+    </div>
+    <div class="side-name slyk-abs slyk-bold" style="top: 442px">
+        {{ nextStart() }}
+    </div>
+    <div class="side-desc slyk-abs" style="top: 475px">{{ next.description }}</div>
+}
+@if (info().later; as later) {
+    <div class="side-name slyk-abs slyk-bold slyk-nowrap" style="top: 753px">
+        {{ later.title }}
+    </div>
+    <div class="side-name slyk-abs slyk-bold" style="top: 777px">
+        {{ laterStart() }}
+    </div>
+    <div class="side-desc slyk-abs" style="top: 813px">{{ later.description }}</div>
+}
+
+<!-- bouquet title bar: TimeLineBG 491,323 1430×62 -->
+<div class="slyk-timeline-bar" style="left: 491px; top: 323px; width: 1430px; height: 62px"></div>
+<div class="bouquet slyk-abs slyk-bold">{{ tv.bouquet().label }}</div>
+
+<!-- service list -->
+@if (channels().length === 0) {
+    <div class="empty slyk-abs">
+        {{ tv.channelsLoading() ? 'Loading channels…' : 'No services in this bouquet' }}
+    </div>
+}
+@for (channel of visible(); track $index; let row = $index) {
+    <div
+        class="service slyk-abs"
+        role="option"
+        [attr.aria-selected]="pageStart() + row === index()"
+        [class.selected]="pageStart() + row === index()"
+        [class.playing]="isPlaying(channel)"
+        [style.top.px]="385 + row * rowHeight"
+        (click)="select(row)"
+    >
+        <span class="number">{{ tv.numberOf(channel) }}</span>
+        <span class="name slyk-nowrap">{{ tv.displayName(channel) }}</span>
+        @if (nowTitle(channel)) {
+            <span class="slyk-progress bar"><span [style.width.%]="progress(channel)"></span></span>
+            <span class="event slyk-bold slyk-nowrap">{{ nowTitle(channel) }}</span>
+        }
+    </div>
+}
+
+<app-slyk-buttons [labels]="buttons()" />

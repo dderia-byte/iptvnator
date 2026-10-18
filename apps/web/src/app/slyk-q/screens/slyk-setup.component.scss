@@ -1,0 +1,39 @@
+.description {
+    left: 540px;
+    top: 140px;
+    width: 1002px;
+    height: 195px;
+    overflow: hidden;
+}
+
+// ConfigList: textOffset 15, ConfigListSeperator 501 (value column)
+.row {
+    left: 540px;
+    width: 1002px;
+    height: 78px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    .label {
+        width: 486px;
+        flex: none;
+    }
+
+    .value {
+        flex: 1;
+        text-align: right;
+    }
+
+    .arrow {
+        padding: 0 10px;
+        color: var(--slyk-bluetext);
+    }
+
+    .more {
+        color: var(--slyk-bluetext);
+    }
+}

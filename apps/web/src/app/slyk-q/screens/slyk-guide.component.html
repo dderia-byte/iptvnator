@@ -1,0 +1,71 @@
+<div class="slyk-bg"></div>
+
+<!-- Pig 0,0 500×285 with the service name and right edge -->
+<div class="pig-edge slyk-abs"></div>
+<div class="pig-name slyk-abs slyk-bold slyk-nowrap slyk-shadow">{{ playingName() }}</div>
+<div class="slyk-nav-line" style="left: 482px; height: 275px"></div>
+
+<!-- selected event -->
+<div class="event-name slyk-abs slyk-bold slyk-nowrap">
+    {{ guide.selectedCell()?.title || '' }}
+</div>
+<div class="event-desc slyk-abs">{{ event()?.description }}</div>
+<div class="divider slyk-abs"></div>
+@if (channel()) {
+    <app-slyk-picon
+        style="left: 1475px; top: 38px; width: 150px; height: 90px"
+        [channel]="channel()"
+        [name]="channelName()"
+    />
+    <div class="meta slyk-abs" style="top: 140px">{{ length() }}</div>
+    <div class="meta slyk-abs" style="top: 177px">{{ startedAt() }}</div>
+    <div class="slyk-badge" style="left: 1635px; top: 146px">{{ badge() }}</div>
+}
+
+<!-- TimeLineBG2 ×2: bouquet title and timeline -->
+<div class="bar2 slyk-abs" style="top: 275px"></div>
+<div class="bar2 slyk-abs" style="top: 330px"></div>
+<div class="bouquet slyk-abs slyk-bold">{{ tv.bouquet().label }}</div>
+@for (label of guide.labels(); track label.left) {
+    <div class="time slyk-abs slyk-bold" [style.left.px]="serviceWidth + 12 + label.left">
+        {{ label.label }}
+    </div>
+}
+
+<!-- services and events -->
+@for (row of guide.rows(); track $index; let r = $index) {
+    <div
+        class="service slyk-abs slyk-nowrap"
+        [class.now]="isPlaying(r)"
+        [class.selected]="r === guide.selectedRow()"
+        [style.top.px]="385 + r * rowHeight"
+        [style.height.px]="rowHeight"
+    >
+        {{ tv.numberOf(row.channel) }}&nbsp;&nbsp;{{ tv.displayName(row.channel) }}
+    </div>
+    @for (cell of row.cells; track cell.left; let c = $index) {
+        <div
+            class="cell slyk-abs slyk-nowrap"
+            [class.now]="cell.isNow"
+            [class.selected]="r === guide.selectedRow() && c === guide.selectedCellIndex()"
+            [style.left.px]="serviceWidth + cell.left"
+            [style.width.px]="cell.width"
+            [style.top.px]="385 + r * rowHeight"
+            [style.height.px]="rowHeight"
+            (click)="pick(r, cell.left + 1)"
+        >
+            {{ cell.title }}
+        </div>
+    }
+}
+@if (guide.rows().length === 0) {
+    <div class="empty slyk-abs">No services in this bouquet</div>
+}
+@if (guide.nowX() !== null) {
+    <div class="now-marker" [style.left.px]="serviceWidth + guide.nowX()! - 11"></div>
+}
+
+<!-- footer: date under the service column, coloured keys to the right -->
+<div class="date-bg slyk-abs"></div>
+<div class="date slyk-abs">{{ date() }}</div>
+<app-slyk-buttons [labels]="buttons" />

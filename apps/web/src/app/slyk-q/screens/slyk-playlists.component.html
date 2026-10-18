@@ -1,0 +1,27 @@
+<app-slyk-template title="Playlists" />
+
+<div class="description slyk-abs">{{ description() }}</div>
+
+<!-- menu: 540,385 1002×697, itemHeight 78 -->
+<div class="slyk-rows" style="left: 540px; top: 384px; width: 1002px; height: 624px"></div>
+@if (selected()) {
+    <div
+        class="slyk-selectbar"
+        style="left: 540px; width: 1002px; height: 78px"
+        [style.top.px]="385 + (index() - pageStart()) * 78"
+    ></div>
+}
+@for (playlist of visible(); track playlist._id; let i = $index) {
+    <div
+        class="row slyk-abs"
+        [style.top.px]="385 + i * 78"
+        (click)="index.set(pageStart() + i); open(playlist)"
+    >
+        <span class="name slyk-nowrap">{{ label(playlist) }}</span>
+        @if (isActive(playlist)) {
+            <span class="current">Current</span>
+        }
+    </div>
+}
+
+<app-slyk-buttons [labels]="['', 'Add source', 'Manage sources']" />

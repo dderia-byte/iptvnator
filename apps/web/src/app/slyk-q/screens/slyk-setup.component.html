@@ -1,0 +1,37 @@
+<app-slyk-template title="Setup" />
+
+<!-- description 540,140 1002×195 -->
+<div class="description slyk-abs">{{ description() }}</div>
+
+<!-- config: 540,385 1002×624, itemHeight 78, setup-bg.png rules -->
+<div class="slyk-rows" style="left: 540px; top: 384px; width: 1002px; height: 624px"></div>
+<div
+    class="slyk-selectbar"
+    style="left: 540px; width: 1002px; height: 78px"
+    [style.top.px]="385 + index() * 78"
+></div>
+@for (row of rows; track row.label; let i = $index) {
+    <div
+        class="row slyk-abs"
+        [style.top.px]="385 + i * 78"
+        (click)="index.set(i)"
+        (dblclick)="cycle(row, 1)"
+    >
+        <span class="label">{{ row.label }}</span>
+        @if (row.choices) {
+            <span class="value">
+                @if (i === index()) {
+                    <span class="arrow">‹</span>
+                }
+                {{ valueLabel(row) }}
+                @if (i === index()) {
+                    <span class="arrow">›</span>
+                }
+            </span>
+        } @else if (row.link) {
+            <span class="value more">›</span>
+        }
+    </div>
+}
+
+<app-slyk-buttons [labels]="['Cancel', 'Save']" />

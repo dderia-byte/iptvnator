@@ -1,0 +1,49 @@
+<app-slyk-template title="Main Menu" />
+
+<!-- menu Listbox: 90,545 364×535, itemHeight 78 -->
+@if (area() === 'menu') {
+    <div
+        class="slyk-selectbar"
+        style="left: 90px; width: 364px; height: 78px"
+        [style.top.px]="545 + menuIndex() * 78"
+    ></div>
+}
+<ul class="menu slyk-abs" role="menu">
+    @for (item of items; track item.label; let i = $index) {
+        <li
+            role="menuitem"
+            [class.selected]="area() === 'menu' && i === menuIndex()"
+            (click)="menuIndex.set(i); item.action()"
+        >
+            {{ item.label }}
+        </li>
+    }
+</ul>
+<div class="nav-gradient slyk-abs"></div>
+
+<!-- toppicks: title 542,322; tiles 252×332 on a 264×344 grid from 537,381 -->
+<div class="picks-title slyk-abs">{{ picksTitle() }}</div>
+@for (channel of picks(); track $index; let i = $index) {
+    <div
+        class="tile slyk-abs"
+        [class.focused]="area() === 'tiles' && i === tileIndex()"
+        [style.left.px]="tileLeft(i)"
+        [style.top.px]="tileTop(i)"
+        (click)="tileIndex.set(i); area.set('tiles')"
+    >
+        <div class="poster">
+            <app-slyk-picon
+                class="logo"
+                [channel]="channel"
+                [name]="tv.displayName(channel)"
+                [fallbackSize]="34"
+            />
+            <div class="caption">
+                <div class="name slyk-bold slyk-nowrap">
+                    {{ tv.displayName(channel) }}
+                </div>
+                <div class="now slyk-nowrap">{{ nowTitle(channel) }}</div>
+            </div>
+        </div>
+    </div>
+}

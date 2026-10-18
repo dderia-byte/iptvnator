@@ -1,0 +1,28 @@
+.description {
+    left: 540px;
+    top: 140px;
+    width: 1002px;
+    height: 195px;
+    overflow: hidden;
+}
+
+.row {
+    left: 540px;
+    width: 1002px;
+    height: 78px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 0 15px;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    .name {
+        flex: 1;
+    }
+
+    .current {
+        color: var(--slyk-bluetext);
+    }
+}

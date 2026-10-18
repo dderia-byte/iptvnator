@@ -1,0 +1,39 @@
+<!-- infobar-epg.png band from 705 down -->
+<div class="band slyk-abs"></div>
+<div class="bouquet slyk-abs slyk-bold slyk-shadow">{{ tv.bouquet().label }}</div>
+<div class="timeline slyk-abs"></div>
+@for (label of guide.labels(); track label.left) {
+    <div class="time slyk-abs" [style.left.px]="serviceWidth + 15 + label.left">
+        {{ label.label }}
+    </div>
+}
+
+@for (row of guide.rows(); track $index; let r = $index) {
+    <div
+        class="service slyk-abs slyk-nowrap"
+        [class.selected]="r === guide.selectedRow()"
+        [style.top.px]="795 + r * rowHeight"
+        [style.height.px]="rowHeight"
+    >
+        {{ tv.displayName(row.channel) }}
+    </div>
+    @for (cell of row.cells; track cell.left; let c = $index) {
+        <div
+            class="cell slyk-abs slyk-nowrap"
+            [class.now]="cell.isNow"
+            [class.selected]="r === guide.selectedRow() && c === guide.selectedCellIndex()"
+            [style.left.px]="serviceWidth + cell.left"
+            [style.width.px]="cell.width"
+            [style.top.px]="795 + r * rowHeight"
+            [style.height.px]="rowHeight"
+        >
+            {{ cell.title }}
+        </div>
+    }
+}
+@if (guide.nowX() !== null) {
+    <div class="now-marker" [style.left.px]="serviceWidth + guide.nowX()! - 11"></div>
+}
+
+<div class="date slyk-abs">{{ date() }}</div>
+<app-slyk-buttons [labels]="buttons" [full]="true" />

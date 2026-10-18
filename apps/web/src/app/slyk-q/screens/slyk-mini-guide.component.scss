@@ -1,0 +1,105 @@
+// q-infobars/infobar-epg.png: dark fade into a blue band behind the grid.
+.band {
+    left: 0;
+    top: 660px;
+    width: 1920px;
+    height: 420px;
+    z-index: 1;
+    background:
+        linear-gradient(180deg, transparent 0, rgb(0 0 0 / 55%) 70px, transparent 72px),
+        linear-gradient(90deg, #0d4c94 0%, #0b56a8 40%, #0a6ad0 100%) 0 73px / 100% 100% no-repeat;
+}
+
+.bouquet {
+    left: 12px;
+    top: 678px;
+    width: 1896px;
+    height: 54px;
+    line-height: 54px;
+}
+
+// epg/TimeLineBG.png at 0,733 1920×83 (times row 749)
+.timeline {
+    left: 0;
+    top: 733px;
+    width: 1920px;
+    height: 62px;
+    z-index: 2;
+    background: linear-gradient(90deg, rgb(255 255 255 / 30%), rgb(255 255 255 / 4%) 18%, transparent);
+    border-top: 2px solid rgb(160 200 255 / 60%);
+}
+
+.time {
+    top: 749px;
+    height: 36px;
+    z-index: 3;
+    font-size: 30px;
+    line-height: 36px;
+}
+
+.service {
+    left: 0;
+    width: 375px;
+    padding-left: 18px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    background: var(--slyk-epg);
+    border-bottom: 1px solid var(--slyk-epg-border);
+    font-size: 30px;
+    color: #eee;
+
+    &.selected {
+        background: var(--slyk-epg-selected);
+        color: #fff;
+    }
+}
+
+.cell {
+    padding-left: 15px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    background: var(--slyk-epg);
+    border: 1px solid var(--slyk-epg-border);
+    font-size: 30px;
+    color: #eee;
+
+    &.now {
+        background: var(--slyk-epg-now);
+        color: #fff;
+    }
+
+    &.selected {
+        background: var(--slyk-epg-selected);
+        color: #fff;
+    }
+}
+
+.now-marker {
+    position: absolute;
+    top: 795px;
+    width: 23px;
+    height: 220px;
+    z-index: 4;
+    pointer-events: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        left: 11px;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: rgb(201 230 255 / 60%);
+    }
+}
+
+.date {
+    left: 11px;
+    top: 1030px;
+    width: 360px;
+    height: 38px;
+    font-size: 30px;
+    line-height: 38px;
+}

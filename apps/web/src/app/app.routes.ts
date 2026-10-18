@@ -77,7 +77,18 @@ export const routes: Routes = [
     {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'workspace',
+        redirectTo: 'tv',
+    },
+    {
+        // Slyk Q receiver interface (default). The classic workspace below
+        // stays available from its main menu and setup screens.
+        path: 'tv',
+        canActivate: [serverAccessGuard],
+        resolve: {
+            settingsReady: settingsReadyResolver,
+        },
+        loadChildren: () =>
+            import('./slyk-q/slyk-q.routes').then((m) => m.SLYK_Q_ROUTES),
     },
     {
         path: 'workspace',

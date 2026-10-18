@@ -1,0 +1,48 @@
+@if (infobar() && channel()) {
+    <!-- InfoBar: blackglass from 760 and infobar1.png from 724 -->
+    <div class="ib-glass slyk-abs"></div>
+    <div class="ib-panel slyk-abs"></div>
+
+    <div class="ib-date slyk-abs">{{ date() }}</div>
+    <div class="ib-arrow up slyk-abs"></div>
+    <div class="ib-arrow down slyk-abs"></div>
+    <div class="ib-channel slyk-abs">
+        <span class="slyk-nowrap">{{ number() }} {{ name() }}</span>
+    </div>
+    <app-slyk-picon
+        style="left: 499px; top: 802px; width: 220px; height: 132px"
+        [channel]="channel()"
+        [name]="name()"
+        [fallbackSize]="30"
+    />
+
+    @if (info().now; as now) {
+        <div class="slyk-progress" style="left: 444px; top: 968px; width: 330px">
+            <span [style.width.%]="progress()"></span>
+        </div>
+        <div class="ib-start slyk-abs slyk-bold">{{ nowStart() }}</div>
+        <div class="ib-name slyk-abs slyk-bold slyk-nowrap">{{ now.title }}</div>
+        <div class="ib-desc slyk-abs">{{ now.description }}</div>
+    } @else {
+        <div class="ib-name slyk-abs slyk-bold slyk-nowrap">No event information</div>
+        <div class="ib-desc slyk-abs">{{ name() }}</div>
+    }
+    <div class="slyk-badge" style="left: 599px; top: 987px">{{ badge() }}</div>
+
+    @if (info().next; as next) {
+        <div class="ib-next slyk-abs">{{ next.title }}</div>
+        <div class="ib-next-start slyk-abs">{{ nextStart() }}</div>
+    }
+}
+
+@if (numberEntry()) {
+    <!-- NumberZap 54,783 540×270 -->
+    <div class="numberzap slyk-abs">
+        <div class="nz-name">{{ numberTarget() }}</div>
+        <div class="nz-number slyk-bold">{{ numberEntry() }}</div>
+    </div>
+}
+
+@if (miniGuide()) {
+    <app-slyk-mini-guide (closed)="closeMiniGuide()" />
+}

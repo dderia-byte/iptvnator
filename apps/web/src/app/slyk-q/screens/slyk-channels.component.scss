@@ -1,0 +1,107 @@
+.now-name {
+    left: 518px;
+    top: 73px;
+    width: 909px;
+    height: 48px;
+    font-size: 42px;
+    line-height: 48px;
+}
+
+.now-desc {
+    left: 518px;
+    top: 140px;
+    width: 909px;
+    height: 153px;
+    overflow: hidden;
+}
+
+// q-backgrounds/v-divider.png
+.divider {
+    left: 1454px;
+    top: 82px;
+    width: 2px;
+    height: 211px;
+    background: linear-gradient(180deg, transparent, rgb(255 255 255 / 35%) 15%, rgb(255 255 255 / 35%) 85%, transparent);
+}
+
+.meta {
+    left: 1475px;
+    width: 336px;
+    height: 39px;
+}
+
+.side-name {
+    left: 102px;
+    width: 340px;
+    height: 33px;
+    font-size: 24px;
+}
+
+.side-desc {
+    left: 102px;
+    width: 340px;
+    height: 243px;
+    overflow: hidden;
+    font-size: 24px;
+}
+
+.bouquet {
+    left: 505px;
+    top: 334px;
+    width: 1415px;
+    height: 36px;
+    line-height: 36px;
+}
+
+.empty {
+    left: 518px;
+    top: 385px;
+    width: 1374px;
+    height: 633px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// serviceItemHeight 54, fieldMargins/itemsDistances 12, progressBarWidth 75
+.service {
+    left: 518px;
+    width: 1374px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    &.selected {
+        background: var(--slyk-select);
+    }
+
+    &.playing .name {
+        color: var(--slyk-bluetext);
+    }
+
+    .number {
+        width: 60px;
+        flex: none;
+    }
+
+    .name {
+        width: 420px;
+        flex: none;
+    }
+
+    .bar {
+        position: relative;
+        width: 75px;
+        flex: none;
+        border-color: #fff;
+    }
+
+    .event {
+        flex: 1;
+        color: var(--slyk-bluetext);
+    }
+}

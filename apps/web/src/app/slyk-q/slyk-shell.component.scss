@@ -1,0 +1,268 @@
+// Slyk Q receiver chrome, recreated in CSS from the skin's measurements and
+// colour table (skin.xml <colors>). Layout skin by kiddac (Slyk Q 1080 for
+// Enigma2); no artwork or fonts from the skin are bundled.
+@use '@fontsource/source-sans-3/400.css' as *;
+@use '@fontsource/source-sans-3/600.css' as *;
+
+app-slyk-shell {
+    --slyk-topleft: #014890;
+    --slyk-topmid: #015bb4;
+    --slyk-topright: #0168cb;
+    --slyk-midleft: #024488;
+    --slyk-mid: #0152a4;
+    --slyk-midright: #0063c3;
+    --slyk-botleft: #023d7e;
+    --slyk-botmid: #014c9a;
+    --slyk-botright: #005fbb;
+    --slyk-select: #0c3764;
+    --slyk-select-light: #006fce;
+    --slyk-title-bg: #0153a6;
+    --slyk-bluetext: #6dcff6;
+    --slyk-grey: #8d8d8b;
+    --slyk-epg: #09539e;
+    --slyk-epg-now: #135aa2;
+    --slyk-epg-selected: #2e6dac;
+    --slyk-epg-border: #336498;
+    --slyk-zap: #007f0e;
+    --slyk-progress: #44c1fb;
+    --slyk-progress-bg: #252525;
+    --slyk-blackglass: rgb(0 0 0 / 30%);
+    --slyk-font: 'Source Sans 3', 'Segoe UI', sans-serif;
+
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #000;
+}
+
+.slyk-viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #000;
+    cursor: none;
+}
+
+.slyk-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    color: #fff;
+    font-family: var(--slyk-font);
+    font-size: 33px;
+    font-weight: 400;
+    line-height: 1.2;
+    -webkit-font-smoothing: antialiased;
+
+    // Screens are layout-free hosts: their pieces are positioned on the stage.
+    > :not(.slyk-player, router-outlet) {
+        display: contents;
+    }
+}
+
+// ----- live picture frames (Pig widgets) -----------------------------------
+.slyk-player {
+    position: absolute;
+    z-index: 1;
+    overflow: hidden;
+    background: #000;
+    transition:
+        left 160ms ease,
+        top 160ms ease,
+        width 160ms ease,
+        height 160ms ease;
+
+    .web-player-view {
+        height: 100%;
+    }
+
+    &--full {
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+    }
+
+    &--pig {
+        left: 39px;
+        top: 125px;
+        width: 486px;
+        height: 285px;
+    }
+
+    &--guide {
+        left: 0;
+        top: 0;
+        width: 500px;
+        height: 285px;
+    }
+
+    &--hidden {
+        left: -2000px;
+        width: 1px;
+        height: 1px;
+    }
+
+    // The receiver owns the keyboard and the screen: the Slyk infobar replaces
+    // the player's own pointer chrome in every frame.
+    .player-controls-host {
+        display: none;
+    }
+}
+
+// ----- shared skin pieces --------------------------------------------------
+.slyk-abs {
+    position: absolute;
+    z-index: 2;
+}
+
+.slyk-bold {
+    font-weight: 600;
+}
+
+.slyk-nowrap {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.slyk-shadow {
+    text-shadow: 2px 2px 0 #000;
+}
+
+// q-backgrounds/q-bg.png: the 3×3 colour table blended left→right and
+// top→bottom, with the diagonal sheen and the lens flare top right.
+.slyk-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+        radial-gradient(circle at 1362px 247px, rgb(255 255 255 / 5%) 0 74px, rgb(255 255 255 / 3%) 75px 133px, transparent 134px),
+        radial-gradient(circle at 1522px 164px, rgb(255 255 255 / 5%) 0 56px, transparent 57px),
+        radial-gradient(circle at 1800px 18px, rgb(255 255 255 / 3%) 0 190px, transparent 191px),
+        linear-gradient(180deg, rgb(255 255 255 / 3%), rgb(0 0 0 / 6%)),
+        linear-gradient(100deg, var(--slyk-botleft) 0%, var(--slyk-mid) 48%, var(--slyk-topright) 100%);
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        clip-path: polygon(0 0, 50% 0, 20% 100%, 0 100%);
+        background: linear-gradient(180deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 1%));
+    }
+}
+
+// q-left-nav.png / q-right-nav.png: the bevelled column edges.
+.slyk-nav-line {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    height: 1080px;
+    z-index: 4;
+    pointer-events: none;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+    }
+
+    &::before {
+        left: 18px;
+        background: linear-gradient(180deg, rgb(0 0 0 / 10%), rgb(0 0 0 / 45%) 20%, rgb(0 0 0 / 45%) 80%, rgb(0 0 0 / 10%));
+    }
+
+    &::after {
+        left: 20px;
+        width: 1px;
+        background: linear-gradient(180deg, transparent, rgb(255 255 255 / 18%) 20%, rgb(255 255 255 / 18%) 80%, transparent);
+    }
+}
+
+// q-selectbars/q-menu.png: navy bar, light hairline and the two flares.
+.slyk-selectbar {
+    position: absolute;
+    z-index: 2;
+    background:
+        radial-gradient(ellipse 60px 4px at 50% 4px, rgb(255 255 255 / 90%), transparent),
+        radial-gradient(ellipse 60px 4px at 50% calc(100% - 4px), rgb(255 255 255 / 90%), transparent),
+        var(--slyk-select);
+    border: 1px solid rgb(120 170 230 / 55%);
+    box-shadow:
+        inset 0 0 0 3px rgb(12 55 100 / 60%),
+        inset 0 0 0 4px rgb(150 200 255 / 25%);
+    transition: top 90ms linear;
+}
+
+// epg/TimeLineBG.png: translucent white bar with a dark hairline beneath.
+.slyk-timeline-bar {
+    position: absolute;
+    z-index: 1;
+    background: rgb(255 255 255 / 5%);
+    border-top: 1px solid rgb(255 255 255 / 8%);
+    border-bottom: 1px solid rgb(0 0 0 / 35%);
+}
+
+// setup-bg.png: 78px rows separated by soft white rules.
+.slyk-rows {
+    position: absolute;
+    z-index: 1;
+    background: repeating-linear-gradient(180deg, transparent 0 77px, rgb(255 255 255 / 16%) 77px 78px);
+    border-top: 1px solid rgb(255 255 255 / 16%);
+}
+
+.slyk-progress {
+    position: absolute;
+    z-index: 3;
+    height: 9px;
+    background: var(--slyk-progress-bg);
+    border: 1px solid #555;
+    box-sizing: border-box;
+
+    > span {
+        display: block;
+        height: 100%;
+        background: var(--slyk-progress);
+    }
+}
+
+.slyk-picon {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    span {
+        font-weight: 600;
+        text-align: center;
+        overflow: hidden;
+    }
+}
+
+// HD/SD badges: the outlined white q-icons.
+.slyk-badge {
+    position: absolute;
+    z-index: 3;
+    height: 30px;
+    padding: 0 4px;
+    border: 2px solid #fff;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 26px;
+}
