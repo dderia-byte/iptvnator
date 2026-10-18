@@ -1,11 +1,15 @@
 <div
     class="slyk-viewport"
     [class.pointer]="nav.pointerActive()"
+    [class.slyk-native]="native.active"
+    [class]="native.active ? 'slyk-hole-' + nav.frame() : ''"
     (wheel)="onWheel($event)"
     (contextmenu)="onContextMenu($event)"
 >
     <div class="slyk-stage" [style.transform]="stageTransform()">
-        @if (tv.playback(); as playback) {
+        @if (native.active) {
+            <!-- the device player shows through this transparent frame -->
+        } @else if (tv.playback(); as playback) {
             <div
                 class="slyk-player"
                 [class]="'slyk-player slyk-player--' + nav.frame()"

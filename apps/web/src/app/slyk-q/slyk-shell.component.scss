@@ -309,3 +309,20 @@ app-slyk-shell {
         }
     }
 }
+
+// ----- Fire TV app: the device player sits under a transparent WebView -----
+body.mat-app-background.slyk-native-host,
+body.slyk-native-host app-root,
+.slyk-native-host app-slyk-shell,
+.slyk-viewport.slyk-native {
+    background: transparent;
+}
+
+// Cut the picture-in-graphics hole out of the skin background.
+.slyk-hole-pig .slyk-bg {
+    clip-path: path(evenodd, 'M0 0H1920V1080H0Z M39 125V410H525V125Z');
+}
+
+.slyk-hole-guide .slyk-bg {
+    clip-path: path(evenodd, 'M0 0H1920V1080H0Z M0 0V285H500V0Z');
+}

@@ -16,6 +16,7 @@ import { SettingsStore } from '@iptvnator/services';
 import { SlykEpgService } from './slyk-epg.service';
 import { SlykKey, toSlykKey } from './slyk-keys';
 import { SlykNavService } from './slyk-nav.service';
+import { SlykNativeService } from './slyk-native.service';
 import { SlykPlayerService } from './slyk-player.service';
 import { SlykTvService } from './slyk-tv.service';
 
@@ -33,7 +34,13 @@ const WHEEL_STEP_MS = 120;
 @Component({
     selector: 'app-slyk-shell',
     imports: [RouterOutlet, WebPlayerViewComponent],
-    providers: [SlykTvService, SlykEpgService, SlykNavService, SlykPlayerService],
+    providers: [
+        SlykTvService,
+        SlykEpgService,
+        SlykNavService,
+        SlykPlayerService,
+        SlykNativeService,
+    ],
     templateUrl: './slyk-shell.component.html',
     styleUrls: ['./slyk-shell.component.scss'],
     encapsulation: ViewEncapsulation.None,
@@ -58,6 +65,8 @@ export class SlykShellComponent implements OnInit {
     private lastPointerX = -1;
     private lastPointerY = -1;
     readonly players = inject(SlykPlayerService);
+    /** Fire TV app: the device player draws the picture under the page. */
+    readonly native = inject(SlykNativeService);
     readonly player = computed(
         () =>
             this.players.playerFor(this.tv.activeChannel()) ??
@@ -66,6 +75,11 @@ export class SlykShellComponent implements OnInit {
     );
 
     constructor() {
+        this.native.bind({
+            scale: this.scale,
+            offsetX: this.offsetX,
+            offsetY: this.offsetY,
+        });
         // A newly chosen channel gets its programmes fetched right away so
         // the infobar has now/next by the time it slides in.
         effect(() => {
