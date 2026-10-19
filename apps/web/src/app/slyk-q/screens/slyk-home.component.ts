@@ -105,7 +105,14 @@ export class SlykHomeComponent implements SlykScreen {
 
     constructor() {
         this.nav.register(this, inject(DestroyRef), 'hidden');
-        effect(() => void this.epg.load(([] as Channel[]).concat(...this.rails().map((r) => r.channels))));
+        // Listings for the focused rail and the next one only, to keep the
+        // provider's API traffic low.
+        effect(() => {
+            const rail = this.railIndex();
+            const upTo = this.tileOf(rail) + 6;
+            const rails = this.rails().slice(rail, rail + 2);
+            void this.epg.load(([] as Channel[]).concat(...rails.map((r) => r.channels.slice(0, upTo))));
+        });
     }
 
     tileOf(rail: number): number {

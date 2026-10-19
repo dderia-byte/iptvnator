@@ -32,8 +32,12 @@ const HOUR = 3_600_000;
 const WINDOW_BEFORE = 6 * HOUR;
 const WINDOW_AFTER = 30 * HOUR;
 const BATCH = 60;
-/** Xtream listings are fetched per channel, a few at a time. */
-const XTREAM_PARALLEL = 4;
+/**
+ * Xtream listings are fetched per channel, two at a time with a pause
+ * between calls: panels block an IP that sends bursts of API requests.
+ */
+const XTREAM_PARALLEL = 2;
+const XTREAM_GAP_MS = 250;
 const XTREAM_LISTINGS = 24;
 
 /**
@@ -153,6 +157,7 @@ export class SlykEpgService {
                               .getShortEpg(source.credentials, streamId, XTREAM_LISTINGS)
                               .catch(() => [] as EpgItem[]);
                 this.pending.delete(key);
+                await new Promise((resolve) => setTimeout(resolve, XTREAM_GAP_MS));
                 // A source switch mid-load discards the old panel's listings.
                 if (this.xtream === source) {
                     this.cache.set(key, this.toEvents(items.map(toProgram)));
