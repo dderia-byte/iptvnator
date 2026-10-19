@@ -219,20 +219,15 @@ export class SlykShellComponent implements OnInit {
                 void this.router.navigate(['/tv']);
                 return true;
             case 'epg':
-                // Sky: the Guide button opens the category list first.
                 void this.router.navigate(['/tv/guide']);
                 return true;
             case 'tv':
                 void this.router.navigate(['/tv/watch']);
                 return true;
             case 'back':
-                // Back from a menu screen goes to the main menu; from the main
-                // menu it returns to live TV when a channel is on.
-                void this.router.navigate(
-                    this.router.url.split('?')[0] === '/tv' && this.tv.activeChannel()
-                        ? ['/tv/watch']
-                        : ['/tv']
-                );
+                // Sky Q: Back from a section brings up the main menu (the
+                // menu itself returns to live TV or Home).
+                void this.router.navigate(['/tv/menu']);
                 return true;
             default:
                 return false;

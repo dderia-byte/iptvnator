@@ -1,17 +1,8 @@
-// Dark wash over live TV, heaviest behind the menu, as on Sky Q's home.
-.wash {
-    inset: 0;
-    width: 1920px;
-    height: 1080px;
-    background:
-        linear-gradient(90deg, rgb(2 8 24 / 94%) 0, rgb(2 8 24 / 86%) 28%, rgb(2 8 24 / 55%) 62%, rgb(2 8 24 / 70%) 100%),
-        linear-gradient(180deg, rgb(2 8 24 / 40%), transparent 30%, rgb(2 8 24 / 60%));
-}
-
 .brand {
-    left: 96px;
-    top: 52px;
-    font-size: 62px;
+    left: 70px;
+    top: 26px;
+    z-index: 3;
+    font-size: 58px;
     font-weight: 700;
     letter-spacing: -2px;
     background: linear-gradient(180deg, #d8f3ff, #4cbcf4 50%, #1d8ee0);
@@ -21,85 +12,95 @@
 }
 
 .clock {
-    right: 96px;
-    top: 60px;
-    font-size: 44px;
-    font-weight: 300;
+    left: 210px;
+    top: 44px;
+    z-index: 3;
+    font-size: 32px;
 }
 
-.playing {
-    left: 96px;
-    top: 150px;
-    width: 420px;
-    font-size: 24px;
-    color: rgb(255 255 255 / 80%);
+// ----- hero ------------------------------------------------------------------
+.hero-art {
+    left: 960px;
+    top: 0;
+    width: 960px;
+    height: 500px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // Key art fades into the blue at its left and bottom edges.
+    background: radial-gradient(ellipse 60% 70% at 60% 45%, rgb(120 200 255 / 30%), transparent 70%);
+    mask-image: linear-gradient(90deg, transparent, #000 30%), linear-gradient(180deg, #000 70%, transparent);
+    mask-composite: intersect;
+    animation: slyk-fade 220ms ease-out both;
 
-    .live {
+    .hero-logo {
+        width: 560px;
+        height: 315px;
+        background: none;
+        border-radius: 18px;
+        --slyk-logo-font: 64px;
+    }
+}
+
+.hero {
+    left: 70px;
+    top: 120px;
+    width: 1000px;
+    z-index: 3;
+    animation: slyk-fade 220ms ease-out both;
+}
+
+.hero-chip {
+    display: inline-block;
+    max-width: 600px;
+    padding: 2px 12px;
+    border-radius: 4px;
+    background: rgb(120 200 255 / 30%);
+    border: 1px solid rgb(200 235 255 / 60%);
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.hero-title {
+    margin-top: 10px;
+    font-size: 48px;
+    line-height: 60px;
+}
+
+.hero-meta {
+    font-size: 30px;
+
+    .badge {
         display: inline-block;
-        padding: 2px 8px;
-        margin-right: 6px;
+        margin: 0 8px;
+        padding: 0 6px;
+        border: 2px solid #fff;
         border-radius: 4px;
-        background: #e8262b;
-        color: #fff;
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 700;
-        letter-spacing: 0.06em;
+        line-height: 26px;
         vertical-align: 3px;
     }
 }
 
-.menu-highlight {
-    left: 76px;
-    top: 236px;
-    width: 420px;
-    height: 74px;
-    z-index: 2;
-    border-radius: 10px;
-    background: linear-gradient(90deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 8%));
-    box-shadow: inset 4px 0 0 #3fb6f2;
-    transition: transform var(--slyk-glide), opacity var(--slyk-glide);
-
-    &.dim {
-        opacity: 0.35;
-    }
-}
-
-.menu {
-    left: 76px;
-    top: 236px;
-    width: 420px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    z-index: 3;
-
-    li {
-        height: 74px;
-        padding-left: 24px;
-        line-height: 74px;
-        font-size: 38px;
-        color: rgb(255 255 255 / 62%);
-        cursor: pointer;
-        transition: color var(--slyk-glide), font-weight var(--slyk-glide);
-
-        &.selected {
-            color: #fff;
-        }
-
-        &.active {
-            font-weight: 600;
-        }
-    }
-}
-
-.rails {
-    // Starts 30px early so a focused tile's zoom isn't clipped.
-    left: 530px;
-    top: 140px;
-    width: 1390px;
-    height: 930px;
+.hero-synopsis {
+    margin-top: 8px;
+    max-height: 126px;
     overflow: hidden;
+    font-size: 30px;
+    line-height: 42px;
+}
+
+// ----- rails -----------------------------------------------------------------
+.rails {
+    left: 40px;
+    top: 470px;
+    width: 1880px;
+    height: 610px;
     z-index: 3;
+    overflow: hidden;
 }
 
 .rails-track {
@@ -111,9 +112,9 @@
     position: absolute;
     left: 30px;
     width: calc(100% - 30px);
-    height: 330px;
+    height: 340px;
+    opacity: 0.85;
     transition: opacity var(--slyk-glide);
-    opacity: 0.8;
 
     &.current {
         opacity: 1;
@@ -121,88 +122,138 @@
 }
 
 .rail-title {
-    margin: 10px 0 0;
-    padding-left: 4px;
-    height: 52px;
-    font-size: 32px;
-    font-weight: 600;
-    line-height: 52px;
+    margin: 0;
+    height: 56px;
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 56px;
 }
 
 .rail-track {
     position: relative;
-    height: 248px;
     transition: transform var(--slyk-slide);
 }
 
 .tile {
     position: absolute;
     top: 14px;
-    width: 352px;
+    width: 460px;
+    height: 259px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    overflow: hidden;
     cursor: pointer;
-    transform-origin: 50% 40%;
+    background:
+        radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 14%), transparent 65%),
+        linear-gradient(150deg, #1d4e8f, #0b1d3d);
+    box-shadow: 0 6px 16px rgb(0 0 30 / 40%);
     transition: transform var(--slyk-glide);
 
     &.focused {
-        transform: scale(1.07);
+        transform: scale(1.05);
         z-index: 2;
+        outline: 2px solid #fff;
 
-        .art {
-            outline: 4px solid #fff;
-            box-shadow: 0 10px 28px rgb(0 0 0 / 60%), 0 0 22px rgb(120 200 255 / 35%);
+        // Sky's glints on the top and bottom edges of the focused tile.
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 44px 4px at 50% 0, #fff, rgb(209 247 252 / 85%) 40%, transparent 75%),
+                radial-gradient(ellipse 44px 4px at 50% 100%, #fff, rgb(209 247 252 / 85%) 40%, transparent 75%);
         }
     }
 }
 
-.art {
-    position: relative;
-    height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    overflow: hidden;
-    background:
-        radial-gradient(ellipse at 50% 20%, rgb(255 255 255 / 16%), transparent 65%),
-        linear-gradient(150deg, #1d4e8f, #0b1d3d);
-    box-shadow: 0 4px 14px rgb(0 0 0 / 45%);
-
-    .logo {
-        width: 190px;
-        height: 110px;
-        background: none;
-        --slyk-logo-font: 26px;
-    }
-
-    .progress {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 6px;
-        background: rgb(255 255 255 / 20%);
-
-        span {
-            display: block;
-            height: 100%;
-            background: #3fb6f2;
-        }
-    }
+.tile-logo {
+    position: absolute;
+    left: 105px;
+    top: 30px;
+    width: 250px;
+    height: 140px;
+    background: none;
+    --slyk-logo-font: 30px;
 }
 
-.caption {
-    margin-top: 10px;
-    font-size: 25px;
-    font-weight: 600;
+.tile-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 40px 16px 14px;
+    background: linear-gradient(180deg, transparent, rgb(0 0 20 / 75%) 50%);
 }
 
-.sub {
+.tile-channel {
     font-size: 20px;
-    color: rgb(255 255 255 / 60%);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 85%);
+}
+
+.tile-title {
+    font-size: 28px;
+}
+
+.tile-progress,
+.card-progress {
+    height: 4px;
+    background: rgb(255 255 255 / 25%);
+
+    span {
+        display: block;
+        height: 100%;
+        background: var(--slyk-progress);
+    }
+}
+
+.tile-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+// Sky's dark-navy now/next cards.
+.tile.card {
+    padding: 18px 20px;
+    background: #0a1a7a;
+}
+
+.card-chip {
+    display: inline-block;
+    max-width: 100%;
+    padding: 0 8px;
+    border-radius: 3px;
+    background: rgb(120 200 255 / 30%);
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.card-title {
+    margin-top: 10px;
+    font-size: 28px;
+
+    &.next {
+        margin-top: 18px;
+    }
+}
+
+.card-when {
+    font-size: 24px;
+    color: rgb(255 255 255 / 80%);
+}
+
+.card-progress {
+    margin-top: 8px;
+    border-radius: 2px;
+    overflow: hidden;
 }
 
 .empty {
-    padding: 40px 4px;
+    padding: 40px 30px;
     font-size: 32px;
-    color: rgb(255 255 255 / 75%);
 }

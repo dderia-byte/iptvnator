@@ -41,8 +41,8 @@ import { Channel } from '@iptvnator/shared/interfaces';
         }
 
         img {
-            max-width: 90%;
-            max-height: 84%;
+            width: 90%;
+            height: 84%;
             object-fit: contain;
         }
 

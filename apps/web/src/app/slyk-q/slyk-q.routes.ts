@@ -1,7 +1,9 @@
 import { Routes } from '@angular/router';
 import { SlykChannelsComponent } from './screens/slyk-channels.component';
 import { SlykGuideComponent } from './screens/slyk-guide.component';
+import { SlykHelpComponent } from './screens/slyk-help.component';
 import { SlykHomeComponent } from './screens/slyk-home.component';
+import { SlykMenuComponent } from './screens/slyk-menu.component';
 import { SlykPlaylistsComponent } from './screens/slyk-playlists.component';
 import { SlykSetupComponent } from './screens/slyk-setup.component';
 import { SlykWatchComponent } from './screens/slyk-watch.component';
@@ -14,6 +16,8 @@ export const SLYK_Q_ROUTES: Routes = [
         component: SlykShellComponent,
         children: [
             { path: '', pathMatch: 'full', component: SlykHomeComponent },
+            { path: 'menu', component: SlykMenuComponent },
+            { path: 'help', component: SlykHelpComponent },
             { path: 'watch', component: SlykWatchComponent },
             { path: 'channels', component: SlykChannelsComponent },
             { path: 'guide', component: SlykGuideComponent },
