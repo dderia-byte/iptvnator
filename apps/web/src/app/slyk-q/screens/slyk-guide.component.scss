@@ -85,7 +85,10 @@
     color: #eee;
 
     &.now {
-        background: var(--slyk-select);
+        background: var(--sky-focus-bg);
+        outline: var(--sky-focus-border);
+        outline-offset: -1.5px;
+        font-weight: 700;
         color: #fff;
     }
 

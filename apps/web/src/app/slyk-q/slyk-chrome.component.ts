@@ -13,82 +13,101 @@ import { slykTime } from './slyk-format';
 import { SlykTvService } from './slyk-tv.service';
 
 /**
- * Slyk Q "template1": background, logo, clock, the TV PiG panel with the
- * service name, the two column edges and the screen title — the frame shared
- * by the main menu, setup, channel selection and most other screens.
+ * Sky Q's left column, shared by most screens: the glass column with the
+ * wordmark and clock in its header strip, the live preview window below it
+ * and the section title. Screens put their own list or content beside it.
  */
 @Component({
     selector: 'app-slyk-template',
     template: `
         <div class="slyk-bg"></div>
+        <div class="sky-column slyk-abs"></div>
+        <div class="sky-header slyk-abs"></div>
         <div class="slyk-logo slyk-abs" aria-hidden="true">iptv</div>
-        <div class="slyk-clock slyk-abs slyk-shadow">{{ clock() }}</div>
+        <div class="slyk-clock slyk-abs">{{ clock() }}</div>
         @if (showTv()) {
-            <div class="slyk-tv-edge slyk-abs" style="left: 55px"></div>
-            <div class="slyk-tv-edge slyk-abs" style="left: 483px"></div>
-            <div class="slyk-tv-name slyk-abs slyk-bold slyk-nowrap slyk-shadow">
-                {{ serviceName() }}
-            </div>
+            <!-- preview window: live TV shows through; navy when nothing plays -->
+            @if (!serviceName()) {
+                <div class="sky-preview slyk-abs"><span>iptv</span></div>
+            }
         }
-        <div class="slyk-nav-line" style="left: 23px"></div>
-        <div class="slyk-nav-line" style="left: 482px"></div>
         @if (title()) {
-            <h1 class="slyk-title slyk-abs slyk-shadow" [class.small]="smallTitle()">
+            <h1 class="slyk-title slyk-abs" [class.small]="smallTitle()">
                 {{ title() }}
             </h1>
         }
     `,
     styles: `
+        /* the column below the preview window (live TV shows in the gap) */
+        .sky-column {
+            left: 0;
+            top: 410px;
+            width: 500px;
+            height: 670px;
+            z-index: 1;
+            background: linear-gradient(180deg, rgb(11 44 158 / 78%), rgb(9 36 140 / 86%));
+            border-right: 1px solid rgb(160 200 255 / 35%);
+            box-shadow: 6px 0 24px rgb(0 0 40 / 25%);
+        }
+        .sky-header {
+            left: 0;
+            top: 0;
+            width: 500px;
+            height: 125px;
+            z-index: 1;
+            background: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)), rgb(11 44 158 / 80%);
+            border-right: 1px solid rgb(160 200 255 / 35%);
+            border-bottom: 1px solid rgb(255 255 255 / 12%);
+        }
         .slyk-logo {
-            left: 92px;
-            top: 54px;
-            width: 144px;
-            height: 78px;
-            font-size: 76px;
-            font-weight: 600;
-            line-height: 70px;
-            letter-spacing: -3px;
-            background: linear-gradient(180deg, #b8ecff 0%, #3fb6f2 45%, #0a79c9 55%, #1d9fe8 100%);
+            left: 40px;
+            top: 30px;
+            height: 64px;
+            z-index: 3;
+            font-size: 58px;
+            font-weight: 700;
+            line-height: 64px;
+            letter-spacing: -2px;
+            background: linear-gradient(180deg, #d8f3ff, #4cbcf4 50%, #1d8ee0);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            filter: drop-shadow(0 2px 2px rgb(0 0 0 / 45%));
         }
         .slyk-clock {
-            left: 340px;
-            top: 80px;
-            width: 143px;
-            height: 40px;
+            left: 170px;
+            top: 44px;
+            z-index: 3;
+            font-size: 32px;
             line-height: 40px;
         }
-        .slyk-tv-edge {
-            top: 140px;
-            width: 7px;
-            height: 245px;
-            background: rgb(255 255 255 / 7%);
-            z-index: 3;
-        }
-        .slyk-tv-name {
-            left: 54px;
-            top: 353px;
-            width: 437px;
-            height: 32px;
-            font-size: 24px;
-            line-height: 32px;
-            text-align: center;
-            z-index: 3;
+        .sky-preview {
+            left: 0;
+            top: 125px;
+            width: 500px;
+            height: 285px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            padding-left: 40px;
+            box-sizing: border-box;
+            background: #050a1e;
+            font-size: 64px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            color: #fff;
         }
         .slyk-title {
-            left: 102px;
-            top: 400px;
-            width: 342px;
+            left: 60px;
+            top: 440px;
+            width: 420px;
             margin: 0;
-            font-size: 42px;
+            z-index: 3;
+            font-size: 50px;
             font-weight: 400;
             line-height: 1.15;
         }
         .slyk-title.small {
-            font-size: 33px;
+            font-size: 40px;
         }
     `,
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -145,7 +164,8 @@ export class SlykTemplateComponent {
             top: 1018px;
             height: 62px;
             z-index: 1;
-            background: linear-gradient(90deg, rgb(255 255 255 / 9%), rgb(255 255 255 / 13%));
+            /* Sky Q has no footer bar: the keys sit as small hints. */
+            background: none;
         }
         .slyk-key {
             top: 1030px;
@@ -153,7 +173,8 @@ export class SlykTemplateComponent {
             display: flex;
             align-items: center;
             gap: 7px;
-            font-size: 30px;
+            font-size: 24px;
+            color: rgb(255 255 255 / 80%);
         }
         .back {
             left: 1745px;

@@ -6,7 +6,7 @@ describe('slyk native bridge', () => {
         // 1280×720 window: stage scaled by 2/3 with no letterbox.
         const geometry = { scale: 2 / 3, offsetX: 0, offsetY: 0 };
         expect(frameToViewport('full', geometry)).toEqual([0, 0, 1280, 720]);
-        expect(frameToViewport('pig', geometry)).toEqual([26, 250 / 3, 324, 190]);
+        expect(frameToViewport('pig', geometry)).toEqual([0, 250 / 3, 1000 / 3, 190]);
         expect(frameToViewport('hidden', geometry)).toBeNull();
     });
 

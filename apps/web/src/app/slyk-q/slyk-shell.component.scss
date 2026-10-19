@@ -20,17 +20,25 @@ app-slyk-shell {
     --slyk-botleft: #04204d;
     --slyk-botmid: #014c9a;
     --slyk-botright: #005fbb;
-    --slyk-select: #0c3764;
-    --slyk-select-light: #006fce;
+    --slyk-select: #0a1660;
+    // The Sky Q focus box, for any focused element.
+    --sky-focus-bg:
+        radial-gradient(ellipse 36px 4px at 50% 0, #fff, rgb(209 247 252 / 85%) 40%, transparent 75%),
+        radial-gradient(ellipse 36px 4px at 50% 100%, #fff, rgb(209 247 252 / 85%) 40%, transparent 75%),
+        radial-gradient(ellipse 140px 10px at 50% 0, rgb(209 247 252 / 45%), transparent 70%),
+        radial-gradient(ellipse 140px 10px at 50% 100%, rgb(209 247 252 / 45%), transparent 70%),
+        #0a1660;
+    --sky-focus-border: 1.5px solid rgb(190 235 255 / 70%);
+    --slyk-select-light: #2a73ee;
     --slyk-title-bg: #0153a6;
-    --slyk-bluetext: #6dcff6;
+    --slyk-bluetext: #9fdcff;
     --slyk-grey: #8d8d8b;
     --slyk-epg: #09539e;
     --slyk-epg-now: #135aa2;
     --slyk-epg-selected: #2e6dac;
     --slyk-epg-border: #336498;
     --slyk-zap: #007f0e;
-    --slyk-progress: #44c1fb;
+    --slyk-progress: #39a9f5;
     --slyk-progress-bg: #252525;
     --slyk-blackglass: rgb(0 0 0 / 30%);
     --slyk-font: 'DM Sans', 'Source Sans 3', 'Segoe UI', sans-serif;
@@ -109,9 +117,9 @@ app-slyk-shell {
     }
 
     &--pig {
-        left: 39px;
+        left: 0;
         top: 125px;
-        width: 486px;
+        width: 500px;
         height: 285px;
     }
 
@@ -157,23 +165,26 @@ app-slyk-shell {
 
 // q-backgrounds/q-bg.png: the 3×3 colour table blended left→right and
 // top→bottom, with the diagonal sheen and the lens flare top right.
+// Sky Q backdrop: a royal-blue gradient with soft bokeh circles top right
+// and faint diagonal light streaks.
 .slyk-bg {
     position: absolute;
     inset: 0;
     z-index: 0;
     background:
-        radial-gradient(circle at 1362px 247px, rgb(255 255 255 / 5%) 0 74px, rgb(255 255 255 / 3%) 75px 133px, transparent 134px),
-        radial-gradient(circle at 1522px 164px, rgb(255 255 255 / 5%) 0 56px, transparent 57px),
-        radial-gradient(circle at 1800px 18px, rgb(255 255 255 / 3%) 0 190px, transparent 191px),
-        linear-gradient(180deg, rgb(255 255 255 / 3%), rgb(0 0 0 / 6%)),
-        linear-gradient(100deg, var(--slyk-botleft) 0%, var(--slyk-mid) 48%, var(--slyk-topright) 100%);
+        radial-gradient(circle at 1500px 190px, rgb(255 255 255 / 9%) 0 92px, rgb(255 255 255 / 4%) 93px 150px, transparent 151px),
+        radial-gradient(circle at 1720px 90px, rgb(255 255 255 / 7%) 0 64px, transparent 65px),
+        radial-gradient(circle at 1310px 330px, rgb(255 255 255 / 5%) 0 46px, transparent 47px),
+        radial-gradient(circle at 1860px 300px, rgb(255 255 255 / 4%) 0 120px, transparent 121px),
+        linear-gradient(32deg, #0d3bc2 0%, #1449d4 45%, #1e62e6 100%);
 
     &::before {
         content: '';
         position: absolute;
         inset: 0;
-        clip-path: polygon(0 0, 50% 0, 20% 100%, 0 100%);
-        background: linear-gradient(180deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 1%));
+        background:
+            linear-gradient(118deg, transparent 0 38%, rgb(255 255 255 / 5%) 38% 39%, transparent 39% 52%, rgb(255 255 255 / 4%) 52% 56%, transparent 56%),
+            linear-gradient(118deg, transparent 0 70%, rgb(255 255 255 / 3%) 70% 78%, transparent 78%);
     }
 }
 
@@ -208,18 +219,16 @@ app-slyk-shell {
 }
 
 // q-selectbars/q-menu.png: navy bar, light hairline and the two flares.
-.slyk-selectbar {
+// Sky Q focus box: dark navy with a thin light-cyan edge and the bright
+// lens-flare glints centred on its top and bottom edges.
+.slyk-selectbar,
+.sky-focus {
     position: absolute;
     z-index: 2;
-    background:
-        radial-gradient(ellipse 60px 4px at 50% 4px, rgb(255 255 255 / 90%), transparent),
-        radial-gradient(ellipse 60px 4px at 50% calc(100% - 4px), rgb(255 255 255 / 90%), transparent),
-        var(--slyk-select);
-    border: 1px solid rgb(120 170 230 / 55%);
-    box-shadow:
-        inset 0 0 0 3px rgb(12 55 100 / 60%),
-        inset 0 0 0 4px rgb(150 200 255 / 25%);
-    border-radius: 8px;
+    box-sizing: border-box;
+    background: var(--sky-focus-bg);
+    border: var(--sky-focus-border);
+    box-shadow: 0 6px 18px rgb(0 0 30 / 35%);
     transition:
         top var(--slyk-glide),
         left var(--slyk-glide);
@@ -245,10 +254,10 @@ app-slyk-shell {
 .slyk-progress {
     position: absolute;
     z-index: 3;
-    height: 9px;
-    background: var(--slyk-progress-bg);
-    border: 1px solid #555;
-    box-sizing: border-box;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: rgb(255 255 255 / 25%);
 
     > span {
         display: block;
@@ -332,7 +341,7 @@ body.slyk-native-host app-root,
 
 // Cut the picture-in-graphics hole out of the skin background.
 .slyk-hole-pig .slyk-bg {
-    clip-path: path(evenodd, 'M0 0H1920V1080H0Z M39 125V410H525V125Z');
+    clip-path: path(evenodd, 'M0 0H1920V1080H0Z M0 125V410H500V125Z');
 }
 
 .slyk-hole-guide .slyk-bg {

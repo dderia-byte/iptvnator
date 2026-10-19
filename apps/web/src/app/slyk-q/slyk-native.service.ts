@@ -25,7 +25,7 @@ declare global {
 /** Stage rectangles of the Slyk `Pig` widgets (see SlykPlayerFrame). */
 const FRAME_RECTS: Record<SlykPlayerFrame, readonly number[] | null> = {
     full: [0, 0, 1920, 1080],
-    pig: [39, 125, 486, 285],
+    pig: [0, 125, 500, 285],
     guide: [0, 0, 500, 285],
     hidden: null,
 };
