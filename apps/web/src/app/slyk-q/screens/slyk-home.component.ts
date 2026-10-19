@@ -54,7 +54,7 @@ export class SlykHomeComponent implements SlykScreen {
     readonly railStep = RAIL_STEP;
 
     readonly items: MenuItem[] = [
-        { label: 'TV Guide', action: () => this.go('/tv/guide-menu') },
+        { label: 'TV Guide', action: () => this.go('/tv/guide') },
         { label: 'Channels', action: () => this.go('/tv/channels') },
         { label: 'Favourites', action: () => this.openBouquet(BOUQUET_FAVOURITES, '/tv/channels') },
         { label: 'Sports', action: () => this.openGenre('Sports') },
@@ -216,7 +216,7 @@ export class SlykHomeComponent implements SlykScreen {
         if (this.tv.bouquets().some((b) => b.id === id)) {
             this.openBouquet(id, '/tv/guide');
         } else {
-            this.go('/tv/guide-menu');
+            this.go('/tv/guide');
         }
     }
 

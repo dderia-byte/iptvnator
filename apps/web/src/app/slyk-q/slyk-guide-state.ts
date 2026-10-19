@@ -42,15 +42,31 @@ export class SlykGuideState {
         toMs: this.startMs() + this.spanMs,
         width: this.gridWidth,
     }));
-    readonly pageStart = computed(
-        () => Math.floor(this.channelIndex() / this.pageSize) * this.pageSize
+    /**
+     * First row shown. Sky Q pins the focused channel to the top row and
+     * scrolls the list under it; Enigma2 pages through fixed screens.
+     */
+    readonly pageStart = computed(() =>
+        this.pinned
+            ? this.channelIndex()
+            : Math.floor(this.channelIndex() / this.pageSize) * this.pageSize
     );
+    /** Channels on screen, wrapping past the end when pinned. */
+    readonly visibleChannels = computed(() => {
+        const channels = this.channels();
+        if (!this.pinned) {
+            return channels.slice(this.pageStart(), this.pageStart() + this.pageSize);
+        }
+        const count = Math.min(this.pageSize, channels.length);
+        return Array.from(
+            { length: count },
+            (_, i) => channels[(this.pageStart() + i) % channels.length]
+        );
+    });
     readonly rows = computed<SlykGuideRow[]>(() => {
         const window = this.window();
         const now = this.epg.now();
-        return this.channels()
-            .slice(this.pageStart(), this.pageStart() + this.pageSize)
-            .map((channel) => ({
+        return this.visibleChannels().map((channel) => ({
                 channel,
                 cells: buildRow(
                     this.epg.between(channel, window.fromMs, window.toMs),
@@ -82,19 +98,23 @@ export class SlykGuideState {
         private readonly epg: SlykEpgService,
         private readonly pageSize: number,
         private readonly gridWidth: number,
-        private readonly spanMs = 4 * HALF_HOUR
+        private readonly spanMs = 4 * HALF_HOUR,
+        private readonly pinned = false
     ) {
         const start = windowStart(epg.now());
         this.startMs = signal(start);
         this.cursorX.set(nowMarker(this.window(), epg.now()) ?? 0);
-        effect(() => {
-            const page = this.channels().slice(
-                this.pageStart(),
-                this.pageStart() + this.pageSize
-            );
-            void this.epg.load(page);
-        });
+        effect(() => void this.epg.load(this.visibleChannels()));
     }
+
+    /** Index of the channel shown on row `row`. */
+    channelAtRow(row: number): number {
+        const length = this.channels().length;
+        return length ? (this.pageStart() + row) % length : 0;
+    }
+
+    /** True while the window starts at the current half hour. */
+    readonly atNow = computed(() => this.startMs() <= windowStart(this.epg.now()));
 
     /** Puts the cursor on `channel` (e.g. the playing service). */
     focus(channel: Channel | null | undefined): void {

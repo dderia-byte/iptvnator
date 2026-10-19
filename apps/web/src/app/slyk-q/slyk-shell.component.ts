@@ -220,7 +220,7 @@ export class SlykShellComponent implements OnInit {
                 return true;
             case 'epg':
                 // Sky: the Guide button opens the category list first.
-                void this.router.navigate(['/tv/guide-menu']);
+                void this.router.navigate(['/tv/guide']);
                 return true;
             case 'tv':
                 void this.router.navigate(['/tv/watch']);
