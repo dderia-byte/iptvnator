@@ -54,6 +54,19 @@ export function classifyChannel(channel: Pick<Channel, 'name' | 'group'>): SlykG
 }
 
 /**
+ * A provider group title as a Sky-style sub-category label: "UK| SPORTS ᴴᴰ"
+ * becomes "SPORTS". Drops the country prefix and superscript decorations.
+ */
+export function cleanGroupLabel(title: string): string {
+    const cleaned = title
+        .replace(/^\s*[A-Za-z]{2}\s*[|:]\s*/, '')
+        .replace(/[ʰ-˿ᴀ-ᶿ⁰-₟]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    return cleaned || title.trim();
+}
+
+/**
  * Country of a channel from its provider group prefix ("UK| SPORTS",
  * "DE : FILME"): two letters before a bar or colon. Format groups such as
  * "4K|" or "8K|" have no country and belong to every region.

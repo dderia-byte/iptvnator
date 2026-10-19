@@ -41,7 +41,9 @@ export class SlykGuideMenuComponent implements SlykScreen {
     private readonly router = inject(Router);
     readonly tv = inject(SlykTvService);
 
-    readonly mode = signal<'categories' | 'groups'>('categories');
+    readonly mode = signal<'categories' | 'sub' | 'groups'>('categories');
+    /** Category whose sub-categories are listed (mode 'sub'). */
+    readonly genre = signal('');
     readonly index = signal(0);
 
     private readonly categoryRows = computed<GuideMenuRow[]>(() => {
@@ -69,9 +71,30 @@ export class SlykGuideMenuComponent implements SlykScreen {
             .map((b) => ({ id: b.id, label: b.label, count: null }))
     );
 
-    readonly rows = computed(() =>
-        this.mode() === 'categories' ? this.categoryRows() : this.groupRows()
-    );
+    /** "All Sports", then the provider groups holding Sports channels. */
+    private readonly subRows = computed<GuideMenuRow[]>(() => {
+        const genre = this.genre();
+        const all = this.tv.categories.genres().find((g) => g.label === genre);
+        return [
+            {
+                id: GENRE_PREFIX + genre,
+                label: `All ${genre}`,
+                count: all?.count ?? 0,
+            },
+            ...this.tv.categories.subgroupsOf(genre),
+        ];
+    });
+
+    readonly rows = computed(() => {
+        switch (this.mode()) {
+            case 'categories':
+                return this.categoryRows();
+            case 'sub':
+                return this.subRows();
+            default:
+                return this.groupRows();
+        }
+    });
     readonly pageStart = computed(() => Math.floor(this.index() / ROWS) * ROWS);
     readonly page = computed(() => this.pageStart() / ROWS + 1);
     readonly pageCount = computed(() =>
@@ -80,9 +103,16 @@ export class SlykGuideMenuComponent implements SlykScreen {
     readonly visible = computed(() =>
         this.rows().slice(this.pageStart(), this.pageStart() + ROWS)
     );
-    readonly title = computed(() =>
-        this.mode() === 'categories' ? 'TV Guide' : 'Channel Groups'
-    );
+    readonly title = computed(() => {
+        switch (this.mode()) {
+            case 'categories':
+                return 'TV Guide';
+            case 'sub':
+                return this.genre();
+            default:
+                return 'Channel Groups';
+        }
+    });
     readonly description = computed(() => {
         const row = this.rows()[this.index()];
         if (!row) {
@@ -92,6 +122,9 @@ export class SlykGuideMenuComponent implements SlykScreen {
         }
         if (row.id === GROUPS_ROW) {
             return "Browse your provider's own channel groups.";
+        }
+        if (this.mode() === 'categories' && this.hasSubRows(row)) {
+            return `${row.label}: ${row.count?.toLocaleString()} channels. Press OK to see ${row.label} by group.`;
         }
         return row.count !== null
             ? `${row.label}: ${row.count.toLocaleString()} channels. Press OK to open the guide.`
@@ -115,12 +148,38 @@ export class SlykGuideMenuComponent implements SlykScreen {
             : ['Categories', '', 'Previous page', 'Next page']
     );
 
+    private hasSubRows(row: GuideMenuRow): boolean {
+        return (
+            row.id.startsWith(GENRE_PREFIX) &&
+            row.id !== GENRE_PREFIX + REGION_ALL
+        );
+    }
+
+    private backToCategories(): void {
+        const from = this.mode() === 'sub' ? GENRE_PREFIX + this.genre() : GROUPS_ROW;
+        this.mode.set('categories');
+        this.index.set(
+            Math.max(0, this.categoryRows().findIndex((row) => row.id === from))
+        );
+    }
+
     constructor() {
         inject(SlykNavService).register(this, inject(DestroyRef), 'pig');
-        // Open on the category currently shown in the guide.
-        const current = this.categoryRows().findIndex(
-            (row) => row.id === this.tv.bouquetId()
-        );
+        // Open on the category currently shown in the guide, or on its
+        // sub-category list when the guide shows one provider group.
+        const bouquet = this.tv.bouquetId();
+        const current = this.categoryRows().findIndex((row) => row.id === bouquet);
+        if (current < 0 && bouquet.startsWith('group:')) {
+            const genre = this.tv.categories.genres().find((g) =>
+                this.tv.categories.subgroupsOf(g.label).some((s) => s.id === bouquet)
+            );
+            if (genre) {
+                this.genre.set(genre.label);
+                this.mode.set('sub');
+                this.index.set(this.subRows().findIndex((row) => row.id === bouquet));
+                return;
+            }
+        }
         this.index.set(Math.max(0, current));
     }
 
@@ -135,6 +194,12 @@ export class SlykGuideMenuComponent implements SlykScreen {
         }
         if (row.id === GROUPS_ROW) {
             this.mode.set('groups');
+            this.index.set(0);
+            return;
+        }
+        if (this.mode() === 'categories' && this.hasSubRows(row)) {
+            this.genre.set(row.label);
+            this.mode.set('sub');
             this.index.set(0);
             return;
         }
@@ -174,13 +239,11 @@ export class SlykGuideMenuComponent implements SlykScreen {
                     this.tv.categories.stepRegion(1);
                     return true;
                 }
-                this.mode.set('categories');
-                this.index.set(this.categoryRows().length - 1);
+                this.backToCategories();
                 return true;
             case 'back':
-                if (this.mode() === 'groups') {
-                    this.mode.set('categories');
-                    this.index.set(this.categoryRows().length - 1);
+                if (this.mode() !== 'categories') {
+                    this.backToCategories();
                     return true;
                 }
                 return false;

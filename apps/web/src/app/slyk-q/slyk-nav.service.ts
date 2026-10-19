@@ -19,6 +19,8 @@ export interface SlykScreen {
 @Injectable()
 export class SlykNavService {
     readonly frame = signal<SlykPlayerFrame>('pig');
+    /** The last menu screen shown, where Back from live TV returns to. */
+    readonly lastMenuUrl = signal('/tv');
     /** True while the mouse has moved recently; hides again when idle. */
     readonly pointerActive = signal(false);
     private readonly stack: SlykScreen[] = [];

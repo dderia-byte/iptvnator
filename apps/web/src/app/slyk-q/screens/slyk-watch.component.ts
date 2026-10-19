@@ -140,10 +140,12 @@ export class SlykWatchComponent implements SlykScreen {
                 this.miniGuide.set(true);
                 return true;
             case 'back':
+                // Back clears a half-typed channel number, otherwise leaves
+                // live TV for the screen the channel was chosen from.
                 if (this.numberEntry()) {
                     this.numberEntry.set('');
                 } else {
-                    this.hideInfobar();
+                    void this.router.navigateByUrl(this.nav.lastMenuUrl());
                 }
                 return true;
             default:

@@ -1,4 +1,4 @@
-import { classifyChannel } from './slyk-genres';
+import { classifyChannel, cleanGroupLabel } from './slyk-genres';
 
 const ch = (group: string, name = 'Channel') =>
     classifyChannel({ name, group: { title: group } });
@@ -26,5 +26,13 @@ describe('slyk genres', () => {
         expect(ch('UK | VIP', 'BBC News HD')).toBe('News');
         expect(ch('UK | VIP', 'Cartoon Network')).toBe('Kids');
         expect(ch('AR| KUWAIT', 'Al Adalah TV')).toBe('Other Channels');
+    });
+});
+
+describe('cleanGroupLabel', () => {
+    it('drops the country prefix and superscript decorations', () => {
+        expect(cleanGroupLabel('UK| SPORTS \u1D34\u1D30')).toBe('SPORTS');
+        expect(cleanGroupLabel('DE : FILME')).toBe('FILME');
+        expect(cleanGroupLabel('Kids TV')).toBe('Kids TV');
     });
 });

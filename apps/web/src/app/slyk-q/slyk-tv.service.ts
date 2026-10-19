@@ -34,6 +34,7 @@ import {
 } from '@iptvnator/portal/xtream/data-access';
 import {
     GENRE_PREFIX,
+    GROUP_PREFIX,
     REGION_ALL,
     SlykCategoriesService,
 } from './slyk-categories.service';
@@ -47,7 +48,6 @@ export interface SlykBouquet {
 
 export const BOUQUET_ALL = 'all';
 export const BOUQUET_FAVOURITES = 'favourites';
-const GROUP_PREFIX = 'group:';
 
 /**
  * State behind every Slyk Q screen. It owns no data of its own: playlists,

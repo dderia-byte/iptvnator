@@ -4,6 +4,7 @@ import { selectChannels } from '@iptvnator/m3u-state';
 import { Channel } from '@iptvnator/shared/interfaces';
 import {
     classifyChannel,
+    cleanGroupLabel,
     regionOf,
     SLYK_GENRES,
     SlykGenre,
@@ -11,6 +12,7 @@ import {
 
 export const GENRE_PREFIX = 'genre:';
 export const REGION_ALL = 'ALL';
+export const GROUP_PREFIX = 'group:';
 const REGION_KEY = 'slyk-q-region';
 
 function readRegion(): string | null {
@@ -130,4 +132,25 @@ export class SlykCategoriesService {
         );
     });
 
+    /**
+     * Second level under a category: the provider groups holding its
+     * channels in the chosen region, largest first ("Sports" →
+     * "SKY SPORTS", "TNT SPORTS", "FOOTBALL"…).
+     */
+    subgroupsOf(genre: string): { id: string; label: string; count: number }[] {
+        const counts = new Map<string, number>();
+        for (const [channel, channelGenre] of this.genreOf()) {
+            const title = channel.group?.title?.trim();
+            if (channelGenre === genre && title && this.inRegion(channel)) {
+                counts.set(title, (counts.get(title) ?? 0) + 1);
+            }
+        }
+        return [...counts.entries()]
+            .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+            .map(([title, count]) => ({
+                id: GROUP_PREFIX + title,
+                label: cleanGroupLabel(title),
+                count,
+            }));
+    }
 }

@@ -37,7 +37,7 @@
         [style.top.px]="385 + (index() - pageStart()) * 78"
     ></div>
 }
-@for (row of visible(); track row.id; let i = $index) {
+@for (row of visible(); track mode() + row.id; let i = $index) {
     <div
         class="row slyk-abs"
         role="option"
@@ -51,6 +51,9 @@
         <span class="name slyk-nowrap">{{ row.label }}</span>
         @if (row.count !== null) {
             <span class="count">{{ row.count.toLocaleString() }}</span>
+            @if (mode() === 'categories' && isGenre(row) && row.id !== 'genre:ALL') {
+                <span class="count">›</span>
+            }
         } @else {
             <span class="count">›</span>
         }

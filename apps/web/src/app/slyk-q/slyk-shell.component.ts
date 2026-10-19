@@ -9,7 +9,9 @@ import {
     signal,
     ViewEncapsulation,
 } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 import { isTypingInInput } from '@iptvnator/portal/shared/util';
 import { WebPlayerViewComponent } from '@iptvnator/ui/playback';
 import { SettingsStore } from '@iptvnator/services';
@@ -77,6 +79,17 @@ export class SlykShellComponent implements OnInit {
     );
 
     constructor() {
+        // Remember the last menu screen for Back from live TV.
+        this.router.events
+            .pipe(
+                filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+                takeUntilDestroyed()
+            )
+            .subscribe(({ urlAfterRedirects: url }) => {
+                if (url.startsWith('/tv') && !url.startsWith('/tv/watch')) {
+                    this.nav.lastMenuUrl.set(url.split('?')[0]);
+                }
+            });
         this.native.bind({
             scale: this.scale,
             offsetX: this.offsetX,
@@ -130,6 +143,22 @@ export class SlykShellComponent implements OnInit {
         if (this.nav.dispatch(press)) {
             event.preventDefault();
             event.stopPropagation();
+        }
+    }
+
+    /**
+     * A clicked row keeps focus, so its own Enter handler would fire next to
+     * the remote's OK; the remote cursor alone owns the keyboard.
+     */
+    @HostListener('document:click')
+    onClick(): void {
+        const focused = document.activeElement;
+        if (
+            focused instanceof HTMLElement &&
+            focused.closest('.slyk-stage') &&
+            !focused.closest('input, textarea, select')
+        ) {
+            focused.blur();
         }
     }
 
@@ -188,10 +217,12 @@ export class SlykShellComponent implements OnInit {
                 void this.router.navigate(['/tv/watch']);
                 return true;
             case 'back':
-                // Back from a menu screen: to live TV when a channel is on,
-                // otherwise to the main menu (live TV would bounce back here).
+                // Back from a menu screen goes to the main menu; from the main
+                // menu it returns to live TV when a channel is on.
                 void this.router.navigate(
-                    this.tv.activeChannel() ? ['/tv/watch'] : ['/tv']
+                    this.router.url.split('?')[0] === '/tv' && this.tv.activeChannel()
+                        ? ['/tv/watch']
+                        : ['/tv']
                 );
                 return true;
             default:
