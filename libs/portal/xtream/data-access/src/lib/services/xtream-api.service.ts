@@ -244,7 +244,7 @@ export class XtreamApiService {
      */
     async getSeriesStreams(
         credentials: XtreamCredentials,
-        options?: XtreamRequestOptions
+        options?: XtreamVodCatalogRequestOptions
     ): Promise<XtreamSerieItem[]> {
         const response = await this.sendRequest(
             credentials.serverUrl,
@@ -252,6 +252,9 @@ export class XtreamApiService {
                 action: XtreamCodeActions.GetSeries,
                 username: credentials.username,
                 password: credentials.password,
+                ...(options?.categoryId !== undefined
+                    ? { category_id: options.categoryId }
+                    : {}),
             },
             options
         );

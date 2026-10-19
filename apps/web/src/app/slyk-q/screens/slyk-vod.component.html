@@ -1,0 +1,133 @@
+<app-slyk-template [title]="title" />
+
+<!-- categories in the left column, Featured first -->
+@if (area() === 'column') {
+    <div
+        class="sky-focus col-focus"
+        [style.top.px]="columnItems().length > 7 ? 600 : 530 + columnIndex() * 70"
+    ></div>
+}
+@for (entry of columnVisible(); track entry.index; let slot = $index) {
+    <div
+        class="col-item slyk-abs slyk-nowrap"
+        role="option"
+        tabindex="-1"
+        [attr.aria-selected]="entry.index === columnIndex()"
+        [class.selected]="entry.index === columnIndex()"
+        [style.top.px]="530 + slot * 70"
+        (click)="area.set('column'); chooseCategory(entry.index)"
+        (keydown.enter)="chooseCategory(entry.index)"
+    >
+        {{ entry.item.label }}
+    </div>
+}
+
+@if (!vod.available) {
+    <div class="message slyk-abs">{{ title }} come from an Xtream account. Add one under Settings, Playlists and sources.</div>
+} @else if (area() === 'detail' && focused(); as item) {
+    <!-- detail page -->
+    @if (details()?.art || item.poster; as art) {
+        <div class="detail-art slyk-abs" [style.background-image]="'url(' + art + ')'"></div>
+    }
+    <div class="detail slyk-abs">
+        <div class="d-title">{{ item.title }}</div>
+        <div class="d-meta">
+            {{ details()?.length }}
+            @if (item.year) {
+                <span>({{ item.year }})</span>
+            }
+            @if (item.rating) {
+                <span>★ {{ item.rating }}</span>
+            }
+            {{ details()?.genre }}
+        </div>
+        <div class="d-plot">{{ details()?.plot || item.plot }}</div>
+        <div
+            class="d-play"
+            role="button"
+            tabindex="-1"
+            [class.focused]="episodeIndex() < 0"
+            (click)="play(episodes()[0])"
+            (keydown.enter)="play(episodes()[0])"
+        >
+            ▶ {{ item.kind === 'series' ? (episodes().length ? 'Play first episode' : 'Loading episodes…') : 'Play' }}
+        </div>
+        @for (row of episodeWindow(); track row.episode.id) {
+            <div
+                class="d-episode slyk-nowrap"
+                role="button"
+                tabindex="-1"
+                [class.focused]="row.index === episodeIndex()"
+                (mouseenter)="episodeIndex.set(row.index)"
+                (click)="play(row.episode)"
+                (keydown.enter)="play(row.episode)"
+            >
+                <span class="ep-num">S{{ row.episode.season }} E{{ row.episode.number }}</span>
+                {{ row.episode.title }}
+            </div>
+        }
+    </div>
+} @else {
+    <!-- hero for the focused title -->
+    @for (item of [focused()]; track item?.id ?? 'none') {
+        @if (item) {
+            @if (details()?.art || item.poster; as art) {
+                <div class="hero-art slyk-abs" [style.background-image]="'url(' + art + ')'"></div>
+            }
+            <div class="hero slyk-abs">
+                <div class="h-title slyk-nowrap">{{ item.title }}</div>
+                <div class="h-meta">
+                    {{ details()?.length }}
+                    @if (item.year) {
+                        <span>({{ item.year }})</span>
+                    }
+                    @if (item.rating) {
+                        <span>★ {{ item.rating }}</span>
+                    }
+                    {{ details()?.genre }}
+                </div>
+                <div class="h-plot">{{ details()?.plot || item.plot }}</div>
+            </div>
+        }
+    }
+
+    <!-- poster rails (Featured) or the category's poster grid -->
+    <div class="posters slyk-abs">
+        <div class="posters-track" [style.transform]="'translateY(' + -railsOffset() + 'px)'">
+            @for (rail of rails(); track $index; let r = $index) {
+                <section class="rail" [class.grid]="!isFeatured()" [style.top.px]="r * (isFeatured() ? railStep : 340)">
+                    @if (rail.title) {
+                        <h2 class="rail-title slyk-nowrap">{{ rail.title }}</h2>
+                    }
+                    <div class="rail-track" [style.transform]="'translateX(' + -railOffset(r) + 'px)'">
+                        @for (item of rail.items; track item.id; let t = $index) {
+                            <div
+                                class="poster"
+                                role="button"
+                                tabindex="-1"
+                                [class.focused]="isFocused(r, t)"
+                                [style.left.px]="t * posterStep"
+                                (mouseenter)="hoverTile(r, t)"
+                                (click)="focusTile(r, t); openDetail()"
+                                (keydown.enter)="openDetail()"
+                            >
+                                @if (item.poster) {
+                                    <img [src]="item.poster" alt="" loading="lazy" />
+                                }
+                                <span class="p-name">{{ item.title }}</span>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+            @if (!loading() && rails().length === 0) {
+                <div class="message">Nothing in this category.</div>
+            }
+            @if (loading()) {
+                <div class="message">Loading…</div>
+            }
+        </div>
+    </div>
+}
+
+<app-slyk-buttons />

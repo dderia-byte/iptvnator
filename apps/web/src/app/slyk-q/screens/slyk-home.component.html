@@ -39,7 +39,7 @@
                             [class.card]="rail.kind === 'cards'"
                             [class.focused]="isFocused(r, t)"
                             [style.left.px]="t * tileStep"
-                            (mouseenter)="focusTile(r, t)"
+                            (mouseenter)="hoverTile(r, t)"
                             (click)="openTile(r, t)"
                             (keydown.enter)="openTile(r, t)"
                         >

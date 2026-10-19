@@ -21,6 +21,7 @@ import { SlykKey, toSlykKey } from './slyk-keys';
 import { SlykNavService } from './slyk-nav.service';
 import { SlykCategoriesService } from './slyk-categories.service';
 import { SlykRecentService } from './slyk-recent.service';
+import { SlykVodService } from './slyk-vod.service';
 import { SlykNativeService } from './slyk-native.service';
 import { SlykPlayerService } from './slyk-player.service';
 import { SlykTvService } from './slyk-tv.service';
@@ -47,6 +48,7 @@ const WHEEL_STEP_MS = 120;
         SlykNativeService,
         SlykCategoriesService,
         SlykRecentService,
+        SlykVodService,
     ],
     templateUrl: './slyk-shell.component.html',
     styleUrls: ['./slyk-shell.component.scss'],

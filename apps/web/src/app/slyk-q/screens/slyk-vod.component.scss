@@ -1,0 +1,224 @@
+// ----- left column -----------------------------------------------------------
+.col-focus {
+    left: 30px;
+    width: 440px;
+    height: 66px;
+    z-index: 2;
+}
+
+.col-item {
+    left: 54px;
+    width: 400px;
+    height: 66px;
+    z-index: 3;
+    font-size: 32px;
+    line-height: 66px;
+    color: rgb(255 255 255 / 85%);
+    cursor: pointer;
+
+    &.selected {
+        font-weight: 700;
+        color: #fff;
+    }
+}
+
+.message {
+    left: 560px;
+    top: 500px;
+    width: 1200px;
+    padding: 20px 0;
+    font-size: 32px;
+}
+
+// ----- hero ------------------------------------------------------------------
+.hero-art,
+.detail-art {
+    right: 0;
+    top: 0;
+    z-index: 1;
+    background-size: cover;
+    background-position: center 20%;
+    mask-image: linear-gradient(90deg, transparent, #000 35%), linear-gradient(180deg, #000 65%, transparent);
+    mask-composite: intersect;
+    animation: slyk-fade 260ms ease-out both;
+}
+
+.hero-art {
+    width: 900px;
+    height: 440px;
+}
+
+.hero {
+    left: 540px;
+    top: 40px;
+    width: 900px;
+    z-index: 3;
+    animation: slyk-fade 220ms ease-out both;
+}
+
+.h-title,
+.d-title {
+    font-size: 52px;
+    line-height: 64px;
+}
+
+.h-meta,
+.d-meta {
+    font-size: 28px;
+    color: rgb(255 255 255 / 85%);
+
+    span {
+        margin: 0 6px;
+    }
+}
+
+.h-plot {
+    margin-top: 8px;
+    max-height: 126px;
+    overflow: hidden;
+    font-size: 28px;
+    line-height: 42px;
+}
+
+// ----- posters ---------------------------------------------------------------
+.posters {
+    left: 520px;
+    top: 430px;
+    width: 1400px;
+    height: 650px;
+    z-index: 3;
+    overflow: hidden;
+}
+
+.posters-track {
+    position: relative;
+    transition: transform var(--slyk-slide);
+}
+
+.rail {
+    position: absolute;
+    left: 24px;
+    width: calc(100% - 24px);
+    height: 370px;
+
+    &.grid {
+        top: 14px;
+    }
+}
+
+.rail-title {
+    margin: 0;
+    height: 52px;
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 52px;
+}
+
+.rail-track {
+    position: relative;
+    transition: transform var(--slyk-slide);
+}
+
+.poster {
+    position: absolute;
+    top: 10px;
+    width: 200px;
+    height: 300px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    background: linear-gradient(160deg, #1d4e8f, #0b1d3d);
+    box-shadow: 0 6px 16px rgb(0 0 30 / 40%);
+    transition: transform var(--slyk-glide);
+
+    img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .p-name {
+        position: absolute;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        font-size: 22px;
+        font-weight: 700;
+        text-shadow: 0 2px 6px rgb(0 0 0 / 80%);
+    }
+
+    img + .p-name {
+        display: none;
+    }
+
+    &.focused {
+        transform: scale(1.06);
+        z-index: 2;
+        outline: 2px solid #fff;
+
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 30px 4px at 50% 0, #fff, rgb(209 247 252 / 85%) 40%, transparent 75%),
+                radial-gradient(ellipse 30px 4px at 50% 100%, #fff, rgb(209 247 252 / 85%) 40%, transparent 75%);
+        }
+    }
+}
+
+// ----- detail page -------------------------------------------------------------
+.detail-art {
+    width: 1100px;
+    height: 1080px;
+}
+
+.detail {
+    left: 560px;
+    top: 90px;
+    width: 860px;
+    z-index: 3;
+}
+
+.d-plot {
+    margin-top: 16px;
+    max-height: 252px;
+    overflow: hidden;
+    font-size: 30px;
+    line-height: 42px;
+}
+
+.d-play,
+.d-episode {
+    margin-top: 12px;
+    height: 64px;
+    padding: 0 24px;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgb(255 255 255 / 25%);
+    font-size: 30px;
+    line-height: 64px;
+    cursor: pointer;
+
+    &.focused {
+        font-weight: 700;
+        background: var(--sky-focus-bg);
+        outline: var(--sky-focus-border);
+    }
+}
+
+.d-play {
+    margin-top: 30px;
+    width: 420px;
+}
+
+.d-episode {
+    margin-top: 0;
+
+    .ep-num {
+        display: inline-block;
+        width: 130px;
+        color: var(--slyk-bluetext);
+    }
+}

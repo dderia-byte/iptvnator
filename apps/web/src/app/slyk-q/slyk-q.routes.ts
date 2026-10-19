@@ -6,6 +6,7 @@ import { SlykHomeComponent } from './screens/slyk-home.component';
 import { SlykMenuComponent } from './screens/slyk-menu.component';
 import { SlykPlaylistsComponent } from './screens/slyk-playlists.component';
 import { SlykSetupComponent } from './screens/slyk-setup.component';
+import { SlykVodComponent } from './screens/slyk-vod.component';
 import { SlykWatchComponent } from './screens/slyk-watch.component';
 import { SlykShellComponent } from './slyk-shell.component';
 
@@ -18,6 +19,8 @@ export const SLYK_Q_ROUTES: Routes = [
             { path: '', pathMatch: 'full', component: SlykHomeComponent },
             { path: 'menu', component: SlykMenuComponent },
             { path: 'help', component: SlykHelpComponent },
+            { path: 'movies', component: SlykVodComponent, data: { kind: 'vod' } },
+            { path: 'boxsets', component: SlykVodComponent, data: { kind: 'series' } },
             { path: 'watch', component: SlykWatchComponent },
             { path: 'channels', component: SlykChannelsComponent },
             { path: 'guide', component: SlykGuideComponent },

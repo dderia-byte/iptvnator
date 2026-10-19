@@ -373,3 +373,24 @@ body.slyk-native-host app-root,
         transition: none !important;
     }
 }
+
+// ----- section themes (Sky Cinema red for Movies) ----------------------------
+.sky-theme-red {
+    .slyk-bg {
+        background:
+            radial-gradient(circle at 1500px 190px, rgb(255 210 210 / 8%) 0 92px, transparent 93px),
+            radial-gradient(circle at 1720px 90px, rgb(255 210 210 / 6%) 0 64px, transparent 65px),
+            radial-gradient(1px 1px at 20% 30%, rgb(255 255 255 / 60%), transparent),
+            radial-gradient(1px 1px at 70% 60%, rgb(255 255 255 / 50%), transparent),
+            radial-gradient(1.5px 1.5px at 85% 20%, rgb(255 255 255 / 55%), transparent),
+            linear-gradient(32deg, #3a0810 0%, #590d15 45%, #8c1424 100%);
+    }
+
+    .sky-column.slyk-abs {
+        background: linear-gradient(180deg, rgb(70 8 18 / 82%), rgb(50 6 14 / 90%));
+    }
+
+    .sky-header.slyk-abs {
+        background: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)), rgb(70 8 18 / 85%);
+    }
+}

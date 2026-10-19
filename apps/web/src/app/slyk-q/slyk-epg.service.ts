@@ -70,6 +70,11 @@ export class SlykEpgService {
         return !!this.xtream || this.bridge.supportsGuide;
     }
 
+    /** The Xtream account in use (null for M3U playlists). */
+    get xtreamCredentials(): XtreamCredentials | null {
+        return this.xtream?.credentials ?? null;
+    }
+
     /** Switches to an Xtream panel's own listings (null: XMLTV bridge). */
     useXtream(
         credentials: XtreamCredentials | null,

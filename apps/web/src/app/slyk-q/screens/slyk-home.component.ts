@@ -50,6 +50,8 @@ export class SlykHomeComponent implements SlykScreen {
     private readonly router = inject(Router);
     readonly tv = inject(SlykTvService);
     readonly epg = inject(SlykEpgService);
+    /** Hover focuses tiles only while the mouse is really in use. */
+    readonly nav = inject(SlykNavService);
     readonly tileStep = TILE_STEP;
     readonly railStep = RAIL_STEP;
 
@@ -102,7 +104,7 @@ export class SlykHomeComponent implements SlykScreen {
     readonly railsOffset = computed(() => this.railIndex() * RAIL_STEP);
 
     constructor() {
-        inject(SlykNavService).register(this, inject(DestroyRef), 'hidden');
+        this.nav.register(this, inject(DestroyRef), 'hidden');
         effect(() => void this.epg.load(([] as Channel[]).concat(...this.rails().map((r) => r.channels))));
     }
 
@@ -136,6 +138,16 @@ export class SlykHomeComponent implements SlykScreen {
 
     progress(channel: Channel): number {
         return this.epg.progress(this.epg.nowNext(channel).now) * 100;
+    }
+
+    /**
+     * Hover moves focus along the focused rail only: focusing another rail
+     * slides the rails, which would put yet another one under the pointer.
+     */
+    hoverTile(rail: number, tile: number): void {
+        if (this.nav.pointerActive() && rail === this.railIndex()) {
+            this.setTile(rail, tile);
+        }
     }
 
     focusTile(rail: number, tile: number): void {
