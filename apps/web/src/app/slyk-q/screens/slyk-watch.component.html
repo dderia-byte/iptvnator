@@ -47,7 +47,13 @@
             <span class="label">Next</span> {{ nextStart() }} &nbsp;{{ next.title }}
         </div>
     }
-    <div class="ib-hints slyk-abs">▼ Mini guide &nbsp;&nbsp; ▲ All channels &nbsp;&nbsp; OK Hide</div>
+    <div class="ib-hints slyk-abs">
+        @if (browse()) {
+            <span class="browsing">Browsing</span> &nbsp; OK Watch this channel &nbsp;&nbsp; Back Return
+        } @else {
+            ▲▼ Browse channels &nbsp;&nbsp; ◀▶ Mini guide &nbsp;&nbsp; OK Hide
+        }
+    </div>
 }
 
 @if (numberEntry()) {

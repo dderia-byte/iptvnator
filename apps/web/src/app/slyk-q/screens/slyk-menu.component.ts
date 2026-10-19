@@ -31,6 +31,7 @@ export const SLYK_MENU: readonly SlykMenuItem[] = [
     { label: 'Box sets', path: '/tv/boxsets', blurb: 'Whole series to watch from the first episode.' },
     { label: 'Sport', genre: 'Sports', blurb: 'Live sport channels and what is on them now.' },
     { label: 'Kids', genre: 'Kids', blurb: "Children's channels." },
+    { label: 'Search', path: '/tv/search', blurb: 'Find a channel by name.' },
     { label: 'Settings', path: '/tv/settings', blurb: 'Player, guide, playlists and sources.' },
     { label: 'Help', path: '/tv/help', blurb: 'About this interface, and the switch back to the classic screens.' },
 ];

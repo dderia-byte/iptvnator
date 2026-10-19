@@ -1,0 +1,123 @@
+.key {
+    width: 64px;
+    height: 56px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 8%);
+    font-size: 30px;
+    cursor: pointer;
+    transition: background var(--slyk-glide);
+
+    &.focused {
+        background: var(--sky-focus-bg);
+        outline: var(--sky-focus-border);
+        font-weight: 700;
+    }
+}
+
+.query {
+    left: 560px;
+    top: 120px;
+    width: 1300px;
+    height: 80px;
+    z-index: 3;
+    padding: 0 24px;
+    box-sizing: border-box;
+    border-bottom: 2px solid rgb(255 255 255 / 60%);
+    font-size: 48px;
+    line-height: 80px;
+
+    .q-text {
+        white-space: pre;
+    }
+
+    .caret {
+        display: inline-block;
+        width: 3px;
+        height: 48px;
+        margin-left: 4px;
+        vertical-align: -6px;
+        background: #fff;
+        animation: caret-blink 1s steps(1) infinite;
+    }
+}
+
+@keyframes caret-blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.count {
+    left: 584px;
+    top: 220px;
+    z-index: 3;
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.results {
+    left: 540px;
+    top: 280px;
+    width: 1380px;
+    height: 800px;
+    z-index: 3;
+    overflow: hidden;
+}
+
+.track {
+    position: relative;
+    transition: transform var(--slyk-slide);
+}
+
+.tile {
+    position: absolute;
+    margin: 14px 0 0 24px;
+    width: 440px;
+    cursor: pointer;
+
+    .art {
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background:
+            radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 14%), transparent 65%),
+            #1a4fc4;
+        box-shadow: 0 6px 16px rgb(0 0 30 / 40%);
+        transition: transform var(--slyk-glide);
+    }
+
+    .logo {
+        width: 240px;
+        height: 135px;
+        background: none;
+        --slyk-logo-font: 28px;
+    }
+
+    &.focused .art {
+        transform: scale(1.05);
+        outline: 2px solid #fff;
+    }
+}
+
+.caption {
+    margin-top: 10px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.sub {
+    font-size: 22px;
+    color: rgb(255 255 255 / 75%);
+}
+
+.none {
+    padding: 30px 24px;
+    font-size: 32px;
+}

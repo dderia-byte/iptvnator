@@ -9,6 +9,7 @@ import {
     untracked,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { Channel } from '@iptvnator/shared/interfaces';
 import { SlykLogoComponent } from '../slyk-logo.component';
 import { SlykEpgService } from '../slyk-epg.service';
 import { slykResolutionBadge, slykTime } from '../slyk-format';
@@ -44,7 +45,7 @@ export class SlykWatchComponent implements SlykScreen {
     /** On-screen remote for mouse users, shown while the mouse moves. */
     readonly mouseActions = [
         { label: 'Menu', run: () => this.nav.press('menu') },
-        { label: 'Channels', run: () => this.nav.press('up') },
+        { label: 'Channels', run: () => void this.router.navigateByUrl('/tv/channels') },
         { label: 'TV Guide', run: () => this.nav.press('epg') },
         { label: 'Mini Guide', run: () => this.nav.press('right') },
         { label: 'CH −', run: () => this.nav.press('channelDown') },
@@ -54,7 +55,19 @@ export class SlykWatchComponent implements SlykScreen {
     private infobarTimer?: ReturnType<typeof setTimeout>;
     private numberTimer?: ReturnType<typeof setTimeout>;
 
-    readonly channel = this.tv.activeChannel;
+    /** Sky Q banner: Up/Down browse other channels without tuning. */
+    readonly browse = signal(0);
+    /** The channel the banner describes: the playing one, or a browsed one. */
+    readonly channel = computed(() => {
+        const active = this.tv.activeChannel();
+        const offset = this.browse();
+        const list = this.tv.bouquetChannels().length ? this.tv.bouquetChannels() : this.tv.tvChannels();
+        const index = active ? list.findIndex((c) => c.id === active.id && c.url === active.url) : -1;
+        if (!offset || index < 0) {
+            return active;
+        }
+        return list[(index + offset + list.length * 100) % list.length];
+    });
     readonly name = computed(() => this.tv.displayName(this.channel()));
     readonly number = computed(() => this.tv.numberOf(this.channel()));
     readonly info = computed(() => this.epg.nowNext(this.channel()));
@@ -80,8 +93,11 @@ export class SlykWatchComponent implements SlykScreen {
         });
         // Every zap brings the infobar up, then it times out.
         effect(() => {
-            this.channel();
-            untracked(() => this.showInfobar());
+            this.tv.activeChannel();
+            untracked(() => {
+                this.browse.set(0);
+                this.showInfobar();
+            });
         });
         if (!this.channel()) {
             void this.router.navigateByUrl('/tv/channels', { replaceUrl: true });
@@ -100,6 +116,7 @@ export class SlykWatchComponent implements SlykScreen {
     }
 
     hideInfobar(): void {
+        this.browse.set(0);
         clearTimeout(this.infobarTimer);
         this.pinned.set(false);
         this.infobar.set(false);
@@ -117,6 +134,12 @@ export class SlykWatchComponent implements SlykScreen {
             case 'ok':
                 if (this.numberEntry()) {
                     this.commitNumber();
+                } else if (this.browse()) {
+                    const browsed = this.channel();
+                    this.browse.set(0);
+                    if (browsed) {
+                        this.tv.play(browsed);
+                    }
                 } else if (this.infobar()) {
                     this.hideInfobar();
                 } else {
@@ -132,9 +155,14 @@ export class SlykWatchComponent implements SlykScreen {
                 this.tv.zap(key === 'channelUp' ? 1 : -1);
                 return true;
             case 'up':
-                void this.router.navigateByUrl('/tv/channels');
-                return true;
             case 'down':
+                // Browse other channels' now and next in the banner.
+                if (this.infobar()) {
+                    this.browse.update((b) => b + (key === 'up' ? 1 : -1));
+                }
+                this.showInfobar();
+                void this.epg.load([this.channel()].filter((c) => !!c) as Channel[]);
+                return true;
             case 'left':
             case 'right':
                 this.hideInfobar();
@@ -145,6 +173,8 @@ export class SlykWatchComponent implements SlykScreen {
                 // live TV for the screen the channel was chosen from.
                 if (this.numberEntry()) {
                     this.numberEntry.set('');
+                } else if (this.browse()) {
+                    this.browse.set(0);
                 } else {
                     void this.router.navigateByUrl(this.nav.lastMenuUrl());
                 }

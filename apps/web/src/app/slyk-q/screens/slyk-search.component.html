@@ -1,0 +1,57 @@
+<app-slyk-template title="Search" />
+
+<!-- A–Z keyboard in the left column -->
+@for (k of keys; track k; let i = $index) {
+    <div
+        class="key slyk-abs"
+        role="button"
+        tabindex="-1"
+        [class.wide]="k.length > 1"
+        [class.focused]="area() === 'keys' && i === keyIndex()"
+        [style.left.px]="40 + (i % keyColumns) * 72"
+        [style.top.px]="530 + (i - (i % keyColumns)) / keyColumns * 64"
+        (click)="keyIndex.set(i); type(k)"
+        (keydown.enter)="type(k)"
+    >
+        {{ k === 'Delete' ? '⌫' : k === 'Space' ? '␣' : k }}
+    </div>
+}
+
+<!-- what has been typed -->
+<div class="query slyk-abs">
+    <span class="q-text">{{ query() || 'Type a channel name' }}</span><span class="caret"></span>
+</div>
+<div class="count slyk-abs">
+    @if (query()) {
+        Channels ({{ results().length }}{{ results().length >= 60 ? '+' : '' }})
+    }
+</div>
+
+<!-- results -->
+<div class="results slyk-abs">
+    <div class="track" [style.transform]="'translateY(' + -offset() + 'px)'">
+        @for (c of results(); track c.id + c.url; let i = $index) {
+            <div
+                class="tile"
+                role="button"
+                tabindex="-1"
+                [class.focused]="area() === 'results' && i === resultIndex()"
+                [style.left.px]="(i % resultColumns) * 460"
+                [style.top.px]="rowOf(i) * 300"
+                (click)="play(i)"
+                (keydown.enter)="play(i)"
+            >
+                <div class="art">
+                    <app-slyk-logo class="logo" [channel]="c" [name]="tv.displayName(c)" />
+                </div>
+                <div class="caption slyk-nowrap">{{ tv.displayName(c) }}</div>
+                <div class="sub slyk-nowrap">{{ nowTitle(c) }}</div>
+            </div>
+        }
+        @if (query() && results().length === 0) {
+            <div class="none">No channels match "{{ query() }}".</div>
+        }
+    </div>
+</div>
+
+<app-slyk-buttons />

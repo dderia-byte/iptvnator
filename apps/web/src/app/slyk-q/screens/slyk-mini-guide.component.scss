@@ -128,3 +128,45 @@
 .date {
     animation: slyk-rise var(--slyk-slide) both;
 }
+
+// ----- Sky Q restyle: navy panel, guide-style rows, focus box --------------
+.band {
+    background: linear-gradient(180deg, transparent, rgb(2 10 30 / 80%) 60px, rgb(2 10 30 / 94%));
+}
+
+.timeline {
+    background: rgb(255 255 255 / 6%);
+    border-top: none;
+    border-bottom: 1px solid rgb(255 255 255 / 45%);
+}
+
+.service,
+.cell {
+    background: rgb(26 85 222 / 55%);
+    border: none;
+    border-bottom: 1px solid rgb(255 255 255 / 25%);
+}
+
+.cell {
+    border-left: 1px solid rgb(255 255 255 / 30%);
+
+    &.now {
+        background: rgb(26 85 222 / 55%);
+    }
+
+    &.selected {
+        background: rgb(42 115 238 / 95%);
+        font-weight: 700;
+    }
+}
+
+.service.selected {
+    background: var(--sky-focus-bg);
+    outline: var(--sky-focus-border);
+    outline-offset: -1.5px;
+    font-weight: 700;
+}
+
+.now-marker {
+    display: none;
+}

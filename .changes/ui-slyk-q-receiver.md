@@ -4,4 +4,4 @@ area: ui
 highlight: Receiver-style TV interface
 ---
 
-IPTVnator now opens in a TV receiver interface after the Slyk Q 1080 skin, driven by remote-control keys, with a Sky Q style home page over live TV. The TV Guide groups channels into categories, shows channel logos and reads Xtream providers' own listings. The previous interface stays available as Classic View.
+IPTVnator now opens in a Sky Q style TV interface driven by remote-control keys: a Home page with live rails, a TV guide with categories, Movies, Box sets and Catch up TV for Xtream accounts, Search and Settings. The previous interface stays available as Classic view under Help.
