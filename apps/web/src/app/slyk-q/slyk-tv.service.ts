@@ -12,7 +12,6 @@ import {
     selectChannelsLoading,
     selectFavorites,
 } from '@iptvnator/m3u-state';
-import { EpgService } from '@iptvnator/epg/data-access';
 import { createPlaybackSessionKey } from '@iptvnator/playback/util';
 import { PlaylistContextFacade } from '@iptvnator/playlist/shared/util';
 import { PlaylistsService, SettingsStore } from '@iptvnator/services';
@@ -38,7 +37,9 @@ import {
     REGION_ALL,
     SlykCategoriesService,
 } from './slyk-categories.service';
-import { xtreamLiveChannels, xtreamXmltvUrl } from './slyk-xtream';
+import { SlykEpgService } from './slyk-epg.service';
+import { cleanChannelName } from './slyk-format';
+import { xtreamLiveChannels } from './slyk-xtream';
 
 /** A Slyk "bouquet": all channels, favourites, or one playlist group. */
 export interface SlykBouquet {
@@ -80,7 +81,7 @@ export class SlykTvService {
     readonly favouritesSupported = computed(
         () => !this.activePlaylist()?.serverUrl
     );
-    private readonly epgService = inject(EpgService);
+    private readonly slykEpg = inject(SlykEpgService);
     private readonly xtreamCache = new Map<string, Channel[]>();
     private readonly xtreamApi = inject(XtreamApiService);
     private readonly xtreamUrls = inject(XtreamUrlService);
@@ -175,7 +176,8 @@ export class SlykTvService {
             return '';
         }
         const strip = this.settingsStore.stripCountryPrefix?.();
-        return applyChannelNameStrip(channel.name, strip) || channel.name;
+        const name = cleanChannelName(channel.name ?? '');
+        return applyChannelNameStrip(name, strip) || name;
     }
 
     numberOf(channel: Channel | null | undefined): number | null {
@@ -328,6 +330,7 @@ export class SlykTvService {
                 );
                 return;
             }
+            this.slykEpg.useXtream(null);
             void window.electron
                 ?.setUserAgent(playlist.userAgent, playlist.referrer)
                 .catch(() => undefined);
@@ -356,7 +359,7 @@ export class SlykTvService {
         }
     }
 
-    /** Xtream: live channels from the Xtream API, guide from its XMLTV. */
+    /** Xtream: live channels and guide listings from the Xtream API. */
     private async loadXtream(
         account: Pick<
             PlaylistMeta,
@@ -399,7 +402,7 @@ export class SlykTvService {
         }
         this.store.dispatch(ChannelActions.setChannels({ channels }));
         this.store.dispatch(FavoritesActions.hydrateFavorites({ channelIds: [] }));
-        void this.epgService.fetchEpg([xtreamXmltvUrl(account)]);
+        this.slykEpg.useXtream(credentials, channels);
     }
 
     private resolvePlayback(): ResolvedPortalPlayback | null {

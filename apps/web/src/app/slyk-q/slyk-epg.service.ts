@@ -3,7 +3,13 @@ import { EpgRuntimeBridgeService } from '@iptvnator/epg/data-access';
 import { resolveChannelEpgLookupKey } from '@iptvnator/m3u-state';
 import { SettingsStore } from '@iptvnator/services';
 import { Channel, EpgProgram } from '@iptvnator/shared/interfaces';
+import {
+    XtreamApiService,
+    XtreamCredentials,
+} from '@iptvnator/portal/xtream/data-access';
+import { EpgItem } from '@iptvnator/shared/interfaces';
 import { getProgramTimeMs } from '@iptvnator/ui/epg';
+import { XtreamEpgIndex } from './slyk-xtream-epg';
 
 /** A programme with display-clock instants (EPG offset applied). */
 export interface SlykEvent {
@@ -26,17 +32,26 @@ const HOUR = 3_600_000;
 const WINDOW_BEFORE = 6 * HOUR;
 const WINDOW_AFTER = 30 * HOUR;
 const BATCH = 60;
+/** Xtream listings are fetched per channel, a few at a time. */
+const XTREAM_PARALLEL = 4;
+const XTREAM_LISTINGS = 24;
 
 /**
- * Programme data for the Slyk screens, read through the same XMLTV bridge
- * the classic EPG guide uses. The bridge is Electron-only; the PWA runtime
- * reports no guide support and every lookup resolves empty, which the
- * screens render as Enigma2's "No event information".
+ * Programme data for the Slyk screens. M3U playlists read the same XMLTV
+ * bridge the classic EPG guide uses (Electron only). Xtream accounts read
+ * the panel's per-channel listings (get_short_epg), which also work in the
+ * PWA and on Fire TV, and don't depend on the panel's often broken XMLTV.
+ * Channels without data render as Enigma2's "No event information".
  */
 @Injectable()
 export class SlykEpgService {
     private readonly bridge = inject(EpgRuntimeBridgeService);
     private readonly settingsStore = inject(SettingsStore);
+    private readonly xtreamApi = inject(XtreamApiService);
+    private xtream: {
+        credentials: XtreamCredentials;
+        index: XtreamEpgIndex;
+    } | null = null;
 
     /** Display clock, ticking every 15s for progress bars and "now" markers. */
     readonly now = signal(Date.now());
@@ -52,10 +67,25 @@ export class SlykEpgService {
     }
 
     get supported(): boolean {
-        return this.bridge.supportsGuide;
+        return !!this.xtream || this.bridge.supportsGuide;
+    }
+
+    /** Switches to an Xtream panel's own listings (null: XMLTV bridge). */
+    useXtream(
+        credentials: XtreamCredentials | null,
+        channels: readonly Channel[] = []
+    ): void {
+        this.xtream = credentials
+            ? { credentials, index: new XtreamEpgIndex(channels) }
+            : null;
+        this.cache.clear();
+        this.revision.update((r) => r + 1);
     }
 
     keyOf(channel: Channel | null | undefined): string | null {
+        if (this.xtream) {
+            return this.xtream.index.epgId(channel ?? null);
+        }
         return resolveChannelEpgLookupKey(channel) || null;
     }
 
@@ -80,6 +110,10 @@ export class SlykEpgService {
             return;
         }
         keys.forEach((k) => this.pending.add(k));
+        if (this.xtream) {
+            await this.loadXtream(keys, this.xtream);
+            return;
+        }
         const providerNow = Date.now() - this.offsetMinutes * 60_000;
         try {
             for (let i = 0; i < keys.length; i += BATCH) {
@@ -97,6 +131,31 @@ export class SlykEpgService {
         } finally {
             keys.forEach((k) => this.pending.delete(k));
         }
+    }
+
+    private async loadXtream(
+        keys: string[],
+        source: NonNullable<SlykEpgService['xtream']>
+    ): Promise<void> {
+        const queue = [...keys];
+        const worker = async () => {
+            for (let key = queue.shift(); key; key = queue.shift()) {
+                const streamId = source.index.streamId(key);
+                const items =
+                    streamId === null
+                        ? []
+                        : await this.xtreamApi
+                              .getShortEpg(source.credentials, streamId, XTREAM_LISTINGS)
+                              .catch(() => [] as EpgItem[]);
+                this.pending.delete(key);
+                // A source switch mid-load discards the old panel's listings.
+                if (this.xtream === source) {
+                    this.cache.set(key, this.toEvents(items.map(toProgram)));
+                    this.revision.update((r) => r + 1);
+                }
+            }
+        };
+        await Promise.all(Array.from({ length: XTREAM_PARALLEL }, worker));
     }
 
     events(channel: Channel | null | undefined): SlykEvent[] {
@@ -165,4 +224,18 @@ export class SlykEpgService {
             .filter((e) => Number.isFinite(e.startMs) && e.stopMs > e.startMs)
             .sort((a, b) => a.startMs - b.startMs);
     }
+}
+
+function toProgram(item: EpgItem): EpgProgram {
+    const seconds = (value: string) => Number(value) || null;
+    return {
+        start: item.start,
+        stop: item.stop ?? item.end,
+        channel: item.channel_id,
+        title: item.title,
+        desc: item.description || null,
+        category: null,
+        startTimestamp: seconds(item.start_timestamp),
+        stopTimestamp: seconds(item.stop_timestamp),
+    };
 }

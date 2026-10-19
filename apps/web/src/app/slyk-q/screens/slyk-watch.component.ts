@@ -9,9 +9,9 @@ import {
     untracked,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { SlykPiconComponent } from '../slyk-chrome.component';
+import { SlykLogoComponent } from '../slyk-logo.component';
 import { SlykEpgService } from '../slyk-epg.service';
-import { slykDate, slykResolutionBadge, slykTime } from '../slyk-format';
+import { slykResolutionBadge, slykTime } from '../slyk-format';
 import { SlykKeyPress } from '../slyk-keys';
 import { SlykNavService, SlykScreen } from '../slyk-nav.service';
 import { SlykTvService } from '../slyk-tv.service';
@@ -26,7 +26,7 @@ const MAX_DIGITS = 5;
 /** Live TV: Slyk Q `InfoBar`, `NumberZap` and the mini guide over video. */
 @Component({
     selector: 'app-slyk-watch',
-    imports: [SlykPiconComponent, SlykMiniGuideComponent],
+    imports: [SlykLogoComponent, SlykMiniGuideComponent],
     templateUrl: './slyk-watch.component.html',
     styleUrl: './slyk-watch.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,9 +62,10 @@ export class SlykWatchComponent implements SlykScreen {
         () => this.epg.progress(this.info().now) * 100
     );
     readonly nowStart = computed(() => slykTime(this.info().now?.startMs));
+    readonly nowEnd = computed(() => slykTime(this.info().now?.stopMs));
     readonly nextStart = computed(() => slykTime(this.info().next?.startMs));
-    readonly date = computed(() => slykDate(this.epg.now()));
-    readonly badge = computed(() => slykResolutionBadge(this.name()));
+    readonly clock = computed(() => slykTime(this.epg.now()));
+    readonly badge = computed(() => slykResolutionBadge(this.channel()?.name ?? ''));
     readonly numberTarget = computed(() => {
         const value = Number(this.numberEntry());
         return this.tv.displayName(this.tv.tvChannels()[value - 1]) || '';
@@ -131,9 +132,9 @@ export class SlykWatchComponent implements SlykScreen {
                 this.tv.zap(key === 'channelUp' ? 1 : -1);
                 return true;
             case 'up':
-            case 'down':
                 void this.router.navigateByUrl('/tv/channels');
                 return true;
+            case 'down':
             case 'left':
             case 'right':
                 this.hideInfobar();

@@ -7,6 +7,7 @@ import {
     inject,
     OnInit,
     signal,
+    untracked,
     ViewEncapsulation,
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
@@ -19,6 +20,7 @@ import { SlykEpgService } from './slyk-epg.service';
 import { SlykKey, toSlykKey } from './slyk-keys';
 import { SlykNavService } from './slyk-nav.service';
 import { SlykCategoriesService } from './slyk-categories.service';
+import { SlykRecentService } from './slyk-recent.service';
 import { SlykNativeService } from './slyk-native.service';
 import { SlykPlayerService } from './slyk-player.service';
 import { SlykTvService } from './slyk-tv.service';
@@ -44,6 +46,7 @@ const WHEEL_STEP_MS = 120;
         SlykPlayerService,
         SlykNativeService,
         SlykCategoriesService,
+        SlykRecentService,
     ],
     templateUrl: './slyk-shell.component.html',
     styleUrls: ['./slyk-shell.component.scss'],
@@ -79,6 +82,12 @@ export class SlykShellComponent implements OnInit {
     );
 
     constructor() {
+        // Every channel tuned joins the home page's Recently Watched rail.
+        const recent = inject(SlykRecentService);
+        effect(() => {
+            const channel = this.tv.activeChannel();
+            untracked(() => recent.add(channel));
+        });
         // Remember the last menu screen for Back from live TV.
         this.router.events
             .pipe(

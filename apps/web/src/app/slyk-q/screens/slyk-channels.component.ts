@@ -1,3 +1,4 @@
+import { SlykLogoComponent } from '../slyk-logo.component';
 import {
     ChangeDetectionStrategy,
     Component,
@@ -32,7 +33,7 @@ const ROW_HEIGHT = 54;
 /** Slyk Q `ChannelSelection`: bouquet list with now/next/later details. */
 @Component({
     selector: 'app-slyk-channels',
-    imports: [SlykTemplateComponent, SlykButtonsComponent, SlykPiconComponent],
+    imports: [SlykLogoComponent, SlykTemplateComponent, SlykButtonsComponent, SlykPiconComponent],
     templateUrl: './slyk-channels.component.html',
     styleUrl: './slyk-channels.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,7 +69,7 @@ export class SlykChannelsComponent implements SlykScreen {
     readonly selectedName = computed(() =>
         this.tv.displayName(this.selected())
     );
-    readonly badge = computed(() => slykResolutionBadge(this.selectedName()));
+    readonly badge = computed(() => slykResolutionBadge(this.selected()?.name ?? ''));
     readonly length = computed(() => slykLength(this.info().now));
     readonly startedAt = computed(() =>
         slykStartedAt(this.info().now, this.epg.now())

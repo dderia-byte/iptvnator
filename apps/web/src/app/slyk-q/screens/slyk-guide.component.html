@@ -46,7 +46,14 @@
         (click)="pickRow(r); activate()"
         (keydown.enter)="activate()"
     >
-        {{ tv.numberOf(row.channel) }}&nbsp;&nbsp;{{ tv.displayName(row.channel) }}
+        <app-slyk-logo
+            class="logo"
+            [channel]="row.channel"
+            [name]="tv.displayName(row.channel)"
+            [style.height.px]="rowHeight - 12"
+        />
+        <span class="number">{{ tv.numberOf(row.channel) }}</span>
+        <span class="name slyk-nowrap">{{ tv.displayName(row.channel) }}</span>
     </div>
     @for (cell of row.cells; track cell.left; let c = $index) {
         <div

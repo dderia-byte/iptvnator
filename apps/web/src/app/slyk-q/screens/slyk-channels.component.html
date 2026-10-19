@@ -89,6 +89,7 @@
         (keydown.enter)="select(row)"
     >
         <span class="number">{{ tv.numberOf(channel) }}</span>
+        <app-slyk-logo class="logo" [channel]="channel" [name]="tv.displayName(channel)" />
         <span class="name slyk-nowrap">{{ tv.displayName(channel) }}</span>
         @if (nowTitle(channel)) {
             <span class="slyk-progress bar"><span [style.width.%]="progress(channel)"></span></span>

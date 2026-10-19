@@ -4,10 +4,10 @@ import {
     computed,
     inject,
     input,
-    linkedSignal,
 } from '@angular/core';
 import { Channel } from '@iptvnator/shared/interfaces';
 import { SlykEpgService } from './slyk-epg.service';
+import { SlykLogoComponent } from './slyk-logo.component';
 import { SlykNavService } from './slyk-nav.service';
 import { slykTime } from './slyk-format';
 import { SlykTvService } from './slyk-tv.service';
@@ -185,15 +185,17 @@ export class SlykButtonsComponent {
     ] as const;
 }
 
-/** Channel logo (Slyk18Picon) with the service name as fallback. */
+/** Channel logo (Slyk18Picon), with a text badge as fallback. */
 @Component({
     selector: 'app-slyk-picon',
+    imports: [SlykLogoComponent],
     template: `
-        @if (logo() && !failed()) {
-            <img [src]="logo()" alt="" (error)="failed.set(true)" />
-        } @else {
-            <span [style.font-size.px]="fallbackSize()">{{ name() }}</span>
-        }
+        <app-slyk-logo
+            [channel]="channel()"
+            [name]="name()"
+            [style.--slyk-logo-font.px]="fallbackSize()"
+            style="width: 100%; height: 100%"
+        />
     `,
     host: { class: 'slyk-picon' },
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -202,10 +204,4 @@ export class SlykPiconComponent {
     readonly channel = input<Channel | null | undefined>(null);
     readonly name = input('');
     readonly fallbackSize = input(24);
-    readonly logo = computed(() => this.channel()?.tvg?.logo?.trim() || '');
-    /** A broken logo URL falls back to the name until the channel changes. */
-    readonly failed = linkedSignal({
-        source: this.logo,
-        computation: () => false,
-    });
 }

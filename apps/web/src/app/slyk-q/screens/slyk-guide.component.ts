@@ -1,3 +1,4 @@
+import { SlykLogoComponent } from '../slyk-logo.component';
 import {
     ChangeDetectionStrategy,
     Component,
@@ -30,7 +31,7 @@ const GRID_WIDTH = 1920 - SERVICE_WIDTH;
 /** Slyk Q `GraphicalEPGPIG`: the full-screen grid guide with picture. */
 @Component({
     selector: 'app-slyk-guide',
-    imports: [SlykButtonsComponent, SlykPiconComponent],
+    imports: [SlykLogoComponent, SlykButtonsComponent, SlykPiconComponent],
     templateUrl: './slyk-guide.component.html',
     styleUrl: './slyk-guide.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,7 +53,7 @@ export class SlykGuideComponent implements SlykScreen {
     readonly event = computed(() => this.guide.selectedCell()?.event ?? null);
     readonly channel = this.guide.selectedChannel;
     readonly channelName = computed(() => this.tv.displayName(this.channel()));
-    readonly badge = computed(() => slykResolutionBadge(this.channelName()));
+    readonly badge = computed(() => slykResolutionBadge(this.channel()?.name ?? ''));
     readonly length = computed(() => slykLength(this.event()));
     readonly startedAt = computed(() =>
         slykStartedAt(this.event(), this.epg.now())

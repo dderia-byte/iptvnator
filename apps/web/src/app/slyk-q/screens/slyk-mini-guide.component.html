@@ -20,7 +20,13 @@
         (click)="pickRow(r); watch()"
         (keydown.enter)="watch()"
     >
-        {{ tv.displayName(row.channel) }}
+        <app-slyk-logo
+            class="logo"
+            [channel]="row.channel"
+            [name]="tv.displayName(row.channel)"
+            [style.height.px]="rowHeight - 10"
+        />
+        <span class="name slyk-nowrap">{{ tv.displayName(row.channel) }}</span>
     </div>
     @for (cell of row.cells; track cell.left; let c = $index) {
         <div

@@ -173,3 +173,22 @@
     line-height: 38px;
     text-align: center;
 }
+
+.service {
+    gap: 12px;
+
+    .logo {
+        width: 92px;
+        --slyk-logo-font: 13px;
+    }
+
+    .number {
+        min-width: 52px;
+        color: var(--slyk-bluetext);
+    }
+
+    .name {
+        flex: 1;
+        min-width: 0;
+    }
+}

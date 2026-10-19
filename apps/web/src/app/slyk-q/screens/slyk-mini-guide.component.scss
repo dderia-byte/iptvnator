@@ -103,3 +103,28 @@
     font-size: 30px;
     line-height: 38px;
 }
+
+.service {
+    gap: 10px;
+
+    .logo {
+        width: 84px;
+        --slyk-logo-font: 13px;
+    }
+
+    .name {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+// Sky Q mini guide: the panel slides up over the picture.
+.band,
+.bouquet,
+.timeline,
+.time,
+.service,
+.cell,
+.date {
+    animation: slyk-rise var(--slyk-slide) both;
+}

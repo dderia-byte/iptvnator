@@ -1,85 +1,208 @@
+// Dark wash over live TV, heaviest behind the menu, as on Sky Q's home.
+.wash {
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    background:
+        linear-gradient(90deg, rgb(2 8 24 / 94%) 0, rgb(2 8 24 / 86%) 28%, rgb(2 8 24 / 55%) 62%, rgb(2 8 24 / 70%) 100%),
+        linear-gradient(180deg, rgb(2 8 24 / 40%), transparent 30%, rgb(2 8 24 / 60%));
+}
+
+.brand {
+    left: 96px;
+    top: 52px;
+    font-size: 62px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    background: linear-gradient(180deg, #d8f3ff, #4cbcf4 50%, #1d8ee0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.clock {
+    right: 96px;
+    top: 60px;
+    font-size: 44px;
+    font-weight: 300;
+}
+
+.playing {
+    left: 96px;
+    top: 150px;
+    width: 420px;
+    font-size: 24px;
+    color: rgb(255 255 255 / 80%);
+
+    .live {
+        display: inline-block;
+        padding: 2px 8px;
+        margin-right: 6px;
+        border-radius: 4px;
+        background: #e8262b;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        vertical-align: 3px;
+    }
+}
+
+.menu-highlight {
+    left: 76px;
+    top: 236px;
+    width: 420px;
+    height: 74px;
+    z-index: 2;
+    border-radius: 10px;
+    background: linear-gradient(90deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 8%));
+    box-shadow: inset 4px 0 0 #3fb6f2;
+    transition: transform var(--slyk-glide), opacity var(--slyk-glide);
+
+    &.dim {
+        opacity: 0.35;
+    }
+}
+
 .menu {
-    left: 90px;
-    top: 545px;
-    width: 364px;
+    left: 76px;
+    top: 236px;
+    width: 420px;
     margin: 0;
     padding: 0;
     list-style: none;
     z-index: 3;
 
     li {
-        height: 78px;
-        padding-left: 15px;
-        line-height: 78px;
+        height: 74px;
+        padding-left: 24px;
+        line-height: 74px;
+        font-size: 38px;
+        color: rgb(255 255 255 / 62%);
         cursor: pointer;
+        transition: color var(--slyk-glide), font-weight var(--slyk-glide);
+
+        &.selected {
+            color: #fff;
+        }
+
+        &.active {
+            font-weight: 600;
+        }
     }
 }
 
-// 1-panel-gradient.png: the list fades out into the bottom edge.
-.nav-gradient {
-    left: 90px;
-    top: 1015px;
-    width: 364px;
-    height: 65px;
-    z-index: 10;
-    background: linear-gradient(180deg, transparent, rgb(1 76 154 / 85%) 70%, var(--slyk-botmid));
-    pointer-events: none;
+.rails {
+    // Starts 30px early so a focused tile's zoom isn't clipped.
+    left: 530px;
+    top: 140px;
+    width: 1390px;
+    height: 930px;
+    overflow: hidden;
+    z-index: 3;
 }
 
-.picks-title {
-    left: 542px;
-    top: 322px;
-    width: 1000px;
-    height: 48px;
-    font-size: 42px;
-    line-height: 48px;
+.rails-track {
+    position: relative;
+    transition: transform var(--slyk-slide);
 }
 
-// q-toppicks/tile-bg.png: dark frame, 6px border, poster 240×320 inside.
+.rail {
+    position: absolute;
+    left: 30px;
+    width: calc(100% - 30px);
+    height: 330px;
+    transition: opacity var(--slyk-glide);
+    opacity: 0.8;
+
+    &.current {
+        opacity: 1;
+    }
+}
+
+.rail-title {
+    margin: 10px 0 0;
+    padding-left: 4px;
+    height: 52px;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 52px;
+}
+
+.rail-track {
+    position: relative;
+    height: 248px;
+    transition: transform var(--slyk-slide);
+}
+
 .tile {
-    width: 252px;
-    height: 332px;
-    padding: 5px 6px 7px;
-    box-sizing: border-box;
-    background: linear-gradient(180deg, rgb(0 0 0 / 35%), rgb(0 0 0 / 55%));
-    border: 1px solid rgb(255 255 255 / 10%);
+    position: absolute;
+    top: 14px;
+    width: 352px;
     cursor: pointer;
+    transform-origin: 50% 40%;
+    transition: transform var(--slyk-glide);
 
     &.focused {
-        outline: 4px solid #fff;
-        outline-offset: 0;
-        box-shadow: 0 0 18px rgb(255 255 255 / 45%);
+        transform: scale(1.07);
+        z-index: 2;
+
+        .art {
+            outline: 4px solid #fff;
+            box-shadow: 0 10px 28px rgb(0 0 0 / 60%), 0 0 22px rgb(120 200 255 / 35%);
+        }
     }
 }
 
-.poster {
+.art {
     position: relative;
-    width: 240px;
-    height: 320px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
     overflow: hidden;
     background:
-        radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 18%), transparent 70%),
-        linear-gradient(160deg, var(--slyk-topright), var(--slyk-botleft));
+        radial-gradient(ellipse at 50% 20%, rgb(255 255 255 / 16%), transparent 65%),
+        linear-gradient(150deg, #1d4e8f, #0b1d3d);
+    box-shadow: 0 4px 14px rgb(0 0 0 / 45%);
 
     .logo {
-        left: 20px;
-        top: 40px;
-        width: 200px;
-        height: 150px;
+        width: 190px;
+        height: 110px;
+        background: none;
+        --slyk-logo-font: 26px;
     }
 
-    .caption {
+    .progress {
         position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
-        padding: 40px 12px 12px;
-        background: linear-gradient(180deg, transparent, rgb(0 0 0 / 75%) 45%);
-        font-size: 24px;
-    }
+        height: 6px;
+        background: rgb(255 255 255 / 20%);
 
-    .now {
-        color: var(--slyk-bluetext);
-        font-size: 22px;
+        span {
+            display: block;
+            height: 100%;
+            background: #3fb6f2;
+        }
     }
+}
+
+.caption {
+    margin-top: 10px;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.sub {
+    font-size: 20px;
+    color: rgb(255 255 255 / 60%);
+}
+
+.empty {
+    padding: 40px 4px;
+    font-size: 32px;
+    color: rgb(255 255 255 / 75%);
 }

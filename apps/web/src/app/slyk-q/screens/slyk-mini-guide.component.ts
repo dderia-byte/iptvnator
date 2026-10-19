@@ -1,3 +1,4 @@
+import { SlykLogoComponent } from '../slyk-logo.component';
 import {
     ChangeDetectionStrategy,
     Component,
@@ -21,7 +22,7 @@ const SERVICE_WIDTH = 375;
 /** Slyk Q `GraphicalInfoBarEPG`: the mini TV guide over live TV. */
 @Component({
     selector: 'app-slyk-mini-guide',
-    imports: [SlykButtonsComponent],
+    imports: [SlykLogoComponent, SlykButtonsComponent],
     templateUrl: './slyk-mini-guide.component.html',
     styleUrl: './slyk-mini-guide.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

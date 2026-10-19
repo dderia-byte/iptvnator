@@ -3,15 +3,21 @@
 // Enigma2); no artwork or fonts from the skin are bundled.
 @use '@fontsource/source-sans-3/400.css' as *;
 @use '@fontsource/source-sans-3/600.css' as *;
+// DM Sans: an open, rounded sans close to Sky Q's on-screen type.
+@use '@fontsource/dm-sans/latin-300.css' as *;
+@use '@fontsource/dm-sans/latin-400.css' as *;
+@use '@fontsource/dm-sans/latin-500.css' as *;
+@use '@fontsource/dm-sans/latin-600.css' as *;
+@use '@fontsource/dm-sans/latin-700.css' as *;
 
 app-slyk-shell {
     --slyk-topleft: #014890;
     --slyk-topmid: #015bb4;
-    --slyk-topright: #0168cb;
+    --slyk-topright: #1458ad;
     --slyk-midleft: #024488;
-    --slyk-mid: #0152a4;
+    --slyk-mid: #0b3f86;
     --slyk-midright: #0063c3;
-    --slyk-botleft: #023d7e;
+    --slyk-botleft: #04204d;
     --slyk-botmid: #014c9a;
     --slyk-botright: #005fbb;
     --slyk-select: #0c3764;
@@ -27,7 +33,10 @@ app-slyk-shell {
     --slyk-progress: #44c1fb;
     --slyk-progress-bg: #252525;
     --slyk-blackglass: rgb(0 0 0 / 30%);
-    --slyk-font: 'Source Sans 3', 'Segoe UI', sans-serif;
+    --slyk-font: 'DM Sans', 'Source Sans 3', 'Segoe UI', sans-serif;
+    // Sky Q motion: a quick ease-out glide for focus, a softer slide for panels.
+    --slyk-glide: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    --slyk-slide: 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
 
     display: block;
     position: fixed;
@@ -210,7 +219,10 @@ app-slyk-shell {
     box-shadow:
         inset 0 0 0 3px rgb(12 55 100 / 60%),
         inset 0 0 0 4px rgb(150 200 255 / 25%);
-    transition: top 90ms linear;
+    border-radius: 8px;
+    transition:
+        top var(--slyk-glide),
+        left var(--slyk-glide);
 }
 
 // epg/TimeLineBG.png: translucent white bar with a dark hairline beneath.
@@ -325,4 +337,30 @@ body.slyk-native-host app-root,
 
 .slyk-hole-guide .slyk-bg {
     clip-path: path(evenodd, 'M0 0H1920V1080H0Z M0 0V285H500V0Z');
+}
+
+// ----- Sky Q motion --------------------------------------------------------
+@keyframes slyk-fade {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes slyk-rise {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+}
+
+// Each screen fades in as it opens (the backdrop stays put).
+.slyk-stage > :not(.slyk-player, .slyk-message, router-outlet) > :not(.slyk-bg) {
+    animation: slyk-fade 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    app-slyk-shell * {
+        animation: none !important;
+        transition: none !important;
+    }
 }

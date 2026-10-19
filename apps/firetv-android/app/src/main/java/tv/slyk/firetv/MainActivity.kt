@@ -10,6 +10,7 @@ import android.view.WindowManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
@@ -47,6 +48,8 @@ class MainActivity : AppCompatActivity() {
             settings.mediaPlaybackRequiresUserGesture = false
             settings.useWideViewPort = true
             settings.loadWithOverviewMode = true
+            // Provider logos are plain http on an https page.
+            settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             isFocusable = true
             isFocusableInTouchMode = true
         }

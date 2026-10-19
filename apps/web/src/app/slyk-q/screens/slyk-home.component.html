@@ -1,19 +1,31 @@
-<app-slyk-template title="Main Menu" />
-
-<!-- menu Listbox: 90,545 364×535, itemHeight 78 -->
-@if (area() === 'menu') {
-    <div
-        class="slyk-selectbar"
-        style="left: 90px; width: 364px; height: 78px"
-        [style.top.px]="545 + menuIndex() * 78"
-    ></div>
+<!-- Live TV plays full screen behind a dark wash; the blue backdrop when nothing plays. -->
+@if (tv.activeChannel()) {
+    <div class="wash slyk-abs"></div>
+} @else {
+    <div class="slyk-bg"></div>
 }
+
+<div class="brand slyk-abs" aria-hidden="true">iptv</div>
+<div class="clock slyk-abs">{{ clock() }}</div>
+@if (tv.activeChannel(); as playing) {
+    <div class="playing slyk-abs slyk-nowrap">
+        <span class="live">LIVE</span> {{ tv.displayName(playing) }}
+    </div>
+}
+
+<!-- menu: a gliding highlight under the focused item -->
+<div
+    class="menu-highlight slyk-abs"
+    [class.dim]="area() !== 'menu'"
+    [style.transform]="'translateY(' + menuIndex() * 74 + 'px)'"
+></div>
 <ul class="menu slyk-abs" role="menu">
     @for (item of items; track item.label; let i = $index) {
         <li
             role="menuitem"
             tabindex="-1"
-            [class.selected]="area() === 'menu' && i === menuIndex()"
+            [class.selected]="i === menuIndex()"
+            [class.active]="area() === 'menu' && i === menuIndex()"
             (mouseenter)="area.set('menu'); menuIndex.set(i)"
             (click)="menuIndex.set(i); item.action()"
             (keydown.enter)="item.action()"
@@ -22,35 +34,52 @@
         </li>
     }
 </ul>
-<div class="nav-gradient slyk-abs"></div>
 
-<!-- toppicks: title 542,322; tiles 252×332 on a 264×344 grid from 537,381 -->
-<div class="picks-title slyk-abs">{{ picksTitle() }}</div>
-@for (channel of picks(); track $index; let i = $index) {
-    <div
-        class="tile slyk-abs"
-        role="button"
-        tabindex="-1"
-        [class.focused]="area() === 'tiles' && i === tileIndex()"
-        [style.left.px]="tileLeft(i)"
-        [style.top.px]="tileTop(i)"
-        (mouseenter)="area.set('tiles'); tileIndex.set(i)"
-        (click)="openTile(i)"
-        (keydown.enter)="openTile(i)"
-    >
-        <div class="poster">
-            <app-slyk-picon
-                class="logo"
-                [channel]="channel"
-                [name]="tv.displayName(channel)"
-                [fallbackSize]="34"
-            />
-            <div class="caption">
-                <div class="name slyk-bold slyk-nowrap">
-                    {{ tv.displayName(channel) }}
+<!-- rails of channel tiles -->
+<div class="rails slyk-abs">
+    <div class="rails-track" [style.transform]="'translateY(' + -railsOffset() + 'px)'">
+        @for (rail of rails(); track rail.title; let r = $index) {
+            <section class="rail" [style.top.px]="r * railStep" [class.current]="area() === 'rails' && r === railIndex()">
+                <h2 class="rail-title">{{ rail.title }}</h2>
+                <div class="rail-track" [style.transform]="'translateX(' + -railOffset(r) + 'px)'">
+                    @for (channel of rail.channels; track channel.id + channel.url; let t = $index) {
+                        <div
+                            class="tile"
+                            role="button"
+                            tabindex="-1"
+                            [style.left.px]="t * tileStep"
+                            [class.focused]="isFocused(r, t)"
+                            (mouseenter)="focusTile(r, t)"
+                            (click)="openTile(r, t)"
+                            (keydown.enter)="openTile(r, t)"
+                        >
+                            <div class="art">
+                                <app-slyk-logo
+                                    class="logo"
+                                    [channel]="channel"
+                                    [name]="tv.displayName(channel)"
+                                />
+                                @if (nowTitle(channel)) {
+                                    <div class="progress"><span [style.width.%]="nowProgress(channel)"></span></div>
+                                }
+                            </div>
+                            <div class="caption slyk-nowrap">{{ nowTitle(channel) || tv.displayName(channel) }}</div>
+                            <div class="sub slyk-nowrap">
+                                {{ tv.numberOf(channel) }}&nbsp; {{ tv.displayName(channel) }}
+                            </div>
+                        </div>
+                    }
                 </div>
-                <div class="now slyk-nowrap">{{ nowTitle(channel) }}</div>
+            </section>
+        }
+        @if (rails().length === 0) {
+            <div class="empty">
+                @if (tv.channelsLoading()) {
+                    Loading channels…
+                } @else {
+                    Add a playlist under Playlists to fill your home page.
+                }
             </div>
-        </div>
+        }
     </div>
-}
+</div>
