@@ -1,0 +1,91 @@
+<app-slyk-template title="Catch up TV" />
+
+@if (area() === 'column') {
+    <div
+        class="sky-focus col-focus"
+        [style.top.px]="columnItems().length > 7 ? 600 : 530 + columnIndex() * 70"
+    ></div>
+}
+@for (entry of columnVisible(); track entry.index; let slot = $index) {
+    <div
+        class="col-item slyk-abs slyk-nowrap"
+        role="option"
+        tabindex="-1"
+        [attr.aria-selected]="entry.index === columnIndex()"
+        [class.selected]="entry.index === columnIndex()"
+        [style.top.px]="530 + slot * 70"
+        (click)="area.set('column'); chooseColumn(entry.index)"
+        (keydown.enter)="chooseColumn(entry.index)"
+    >
+        {{ entry.item.label }}
+    </div>
+}
+
+@if (!epg.xtreamCredentials) {
+    <div class="message slyk-abs">Catch up TV comes from an Xtream account whose channels keep recordings.</div>
+} @else {
+    @for (h of [hero()]; track h.title) {
+        <div class="hero slyk-abs">
+            @if (h.chip) {
+                <div class="chip slyk-nowrap">{{ h.chip }}</div>
+            }
+            <div class="h-title slyk-nowrap">{{ h.title }}</div>
+            <div class="h-meta">{{ h.meta }}</div>
+            <div class="h-text">{{ h.text }}</div>
+        </div>
+    }
+
+    <div class="grid slyk-abs">
+        <div class="grid-track" [style.transform]="'translateY(' + -offset() + 'px)'">
+            @if (channel(); as ch) {
+                @for (p of programmes(); track p.startMs; let i = $index) {
+                    <div
+                        class="tile"
+                        role="button"
+                        tabindex="-1"
+                        [class.focused]="area() === 'grid' && i === index()"
+                        [style.left.px]="(i % columns) * 460"
+                        [style.top.px]="rowOf(i) * rowStep"
+                        (mouseenter)="hover(i)"
+                        (click)="open(i)"
+                        (keydown.enter)="open(i)"
+                    >
+                        <div class="art">
+                            <app-slyk-logo class="logo" [channel]="ch" [name]="tv.displayName(ch)" />
+                            <span class="play">▶</span>
+                        </div>
+                        <div class="caption slyk-nowrap">{{ p.title }}</div>
+                        <div class="sub slyk-nowrap">{{ when(p) }}</div>
+                    </div>
+                }
+            } @else {
+                @for (c of channels(); track c.id; let i = $index) {
+                    <div
+                        class="tile"
+                        role="button"
+                        tabindex="-1"
+                        [class.focused]="area() === 'grid' && i === index()"
+                        [style.left.px]="(i % columns) * 460"
+                        [style.top.px]="rowOf(i) * rowStep"
+                        (mouseenter)="hover(i)"
+                        (click)="open(i)"
+                        (keydown.enter)="open(i)"
+                    >
+                        <div class="art">
+                            <app-slyk-logo class="logo" [channel]="c" [name]="tv.displayName(c)" />
+                        </div>
+                        <div class="caption slyk-nowrap">{{ tv.displayName(c) }}</div>
+                        <div class="sub">{{ c.catchup?.days ? c.catchup?.days + ' days' : '' }}</div>
+                    </div>
+                }
+            }
+            @if (count() === 0) {
+                <div class="message">
+                    {{ loading() ? 'Loading…' : channel() ? 'No past programmes for this channel.' : 'No channels with catch up here.' }}
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<app-slyk-buttons />

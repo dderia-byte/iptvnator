@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { SlykCatchupComponent } from './screens/slyk-catchup.component';
 import { SlykChannelsComponent } from './screens/slyk-channels.component';
 import { SlykGuideComponent } from './screens/slyk-guide.component';
 import { SlykHelpComponent } from './screens/slyk-help.component';
@@ -21,6 +22,7 @@ export const SLYK_Q_ROUTES: Routes = [
             { path: 'help', component: SlykHelpComponent },
             { path: 'movies', component: SlykVodComponent, data: { kind: 'vod' } },
             { path: 'boxsets', component: SlykVodComponent, data: { kind: 'series' } },
+            { path: 'catchup', component: SlykCatchupComponent },
             { path: 'watch', component: SlykWatchComponent },
             { path: 'channels', component: SlykChannelsComponent },
             { path: 'guide', component: SlykGuideComponent },

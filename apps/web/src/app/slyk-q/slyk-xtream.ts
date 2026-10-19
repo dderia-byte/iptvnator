@@ -54,6 +54,10 @@ export function xtreamLiveChannels(
                 },
                 http: { referrer: '', 'user-agent': '', origin: '' },
                 radio: 'false',
+                // Panels that record a channel offer its past programmes.
+                ...(Number(stream.tv_archive) === 1
+                    ? { catchup: { type: 'xc', days: String(stream.tv_archive_duration ?? '') } }
+                    : {}),
             };
         });
 }

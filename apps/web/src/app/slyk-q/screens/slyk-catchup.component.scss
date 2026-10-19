@@ -1,0 +1,141 @@
+.col-focus {
+    left: 30px;
+    width: 440px;
+    height: 66px;
+    z-index: 2;
+}
+
+.col-item {
+    left: 54px;
+    width: 400px;
+    height: 66px;
+    z-index: 3;
+    font-size: 32px;
+    line-height: 66px;
+    color: rgb(255 255 255 / 85%);
+    cursor: pointer;
+
+    &.selected {
+        font-weight: 700;
+        color: #fff;
+    }
+}
+
+.message {
+    left: 560px;
+    top: 480px;
+    width: 1200px;
+    padding: 20px 0;
+    font-size: 32px;
+}
+
+.hero {
+    left: 540px;
+    top: 50px;
+    width: 1300px;
+    z-index: 3;
+    animation: slyk-fade 200ms ease-out both;
+}
+
+.chip {
+    display: inline-block;
+    max-width: 600px;
+    padding: 2px 12px;
+    border-radius: 4px;
+    background: rgb(120 200 255 / 30%);
+    border: 1px solid rgb(200 235 255 / 60%);
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.h-title {
+    margin-top: 8px;
+    font-size: 52px;
+    line-height: 64px;
+}
+
+.h-meta {
+    font-size: 28px;
+    color: rgb(255 255 255 / 85%);
+}
+
+.h-text {
+    margin-top: 8px;
+    max-height: 126px;
+    overflow: hidden;
+    font-size: 28px;
+    line-height: 42px;
+}
+
+.grid {
+    left: 520px;
+    top: 420px;
+    width: 1400px;
+    height: 660px;
+    z-index: 3;
+    overflow: hidden;
+}
+
+.grid-track {
+    position: relative;
+    transition: transform var(--slyk-slide);
+}
+
+.tile {
+    position: absolute;
+    margin: 16px 0 0 24px;
+    width: 440px;
+    cursor: pointer;
+
+    .art {
+        position: relative;
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        overflow: hidden;
+        background:
+            radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 14%), transparent 65%),
+            #1a4fc4;
+        box-shadow: 0 6px 16px rgb(0 0 30 / 40%);
+        transition: transform var(--slyk-glide);
+    }
+
+    .logo {
+        width: 240px;
+        height: 135px;
+        background: none;
+        --slyk-logo-font: 28px;
+    }
+
+    .play {
+        position: absolute;
+        right: 14px;
+        bottom: 10px;
+        font-size: 30px;
+        text-shadow: 0 2px 6px rgb(0 0 0 / 60%);
+    }
+
+    &.focused .art {
+        transform: scale(1.05);
+        outline: 2px solid #fff;
+        background:
+            radial-gradient(ellipse 40px 4px at 50% 0, #fff, rgb(209 247 252 / 85%) 40%, transparent 75%),
+            radial-gradient(ellipse 40px 4px at 50% 100%, #fff, rgb(209 247 252 / 85%) 40%, transparent 75%),
+            radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 14%), transparent 65%),
+            #1a4fc4;
+    }
+}
+
+.caption {
+    margin-top: 12px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.sub {
+    font-size: 22px;
+    color: rgb(255 255 255 / 75%);
+}

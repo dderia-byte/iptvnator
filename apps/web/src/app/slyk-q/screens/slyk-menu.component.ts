@@ -26,6 +26,7 @@ export const SLYK_MENU: readonly SlykMenuItem[] = [
     { label: 'Home', path: '/tv', blurb: "What's on now, your channels and what you watched last." },
     { label: 'TV guide', path: '/tv/guide', blurb: 'Every channel by category, with programmes for today and the days ahead.' },
     { label: 'Continue watching', path: '/tv', blurb: 'Channels you watched most recently.' },
+    { label: 'Catch up TV', path: '/tv/catchup', blurb: 'Programmes from the last few days on channels your provider records.' },
     { label: 'Movies', path: '/tv/movies', blurb: "Films from your provider's on-demand library." },
     { label: 'Box sets', path: '/tv/boxsets', blurb: 'Whole series to watch from the first episode.' },
     { label: 'Sport', genre: 'Sports', blurb: 'Live sport channels and what is on them now.' },
