@@ -1,39 +1,103 @@
-.description {
-    left: 540px;
-    top: 140px;
-    width: 1002px;
-    height: 195px;
-    overflow: hidden;
+.col-focus {
+    left: 30px;
+    width: 440px;
+    height: 66px;
+    z-index: 2;
 }
 
-// ConfigList: textOffset 15, ConfigListSeperator 501 (value column)
+.col-item {
+    left: 54px;
+    width: 400px;
+    height: 66px;
+    z-index: 3;
+    font-size: 34px;
+    line-height: 66px;
+    color: rgb(255 255 255 / 85%);
+    cursor: pointer;
+
+    &.selected {
+        font-weight: 700;
+        color: #fff;
+    }
+}
+
+.row-focus {
+    left: 590px;
+    width: 1070px;
+    z-index: 2;
+
+    &.dim {
+        opacity: 0.45;
+    }
+}
+
 .row {
-    left: 540px;
-    width: 1002px;
-    height: 78px;
+    left: 590px;
+    width: 1070px;
+    height: 72px;
     z-index: 3;
     display: flex;
     align-items: center;
-    padding: 0 15px;
+    padding: 0 24px;
     box-sizing: border-box;
+    border-bottom: 1px solid rgb(255 255 255 / 25%);
+    font-size: 32px;
     cursor: pointer;
+    transition: top var(--slyk-glide);
 
     .label {
-        width: 486px;
-        flex: none;
+        flex: 1;
     }
 
     .value {
-        flex: 1;
-        text-align: right;
+        color: rgb(255 255 255 / 85%);
     }
 
-    .arrow {
-        padding: 0 10px;
+    &.selected {
+        font-weight: 700;
+        border-bottom-color: transparent;
+    }
+}
+
+.help {
+    left: 614px;
+    width: 1020px;
+    height: 110px;
+    z-index: 3;
+    overflow: hidden;
+    font-size: 28px;
+    line-height: 38px;
+    color: rgb(255 255 255 / 90%);
+}
+
+.options {
+    left: 1680px;
+    width: 230px;
+    z-index: 4;
+    padding: 6px 0;
+    border-radius: 6px;
+    background: rgb(5 20 80 / 92%);
+    border: 1px solid rgb(190 235 255 / 45%);
+    box-shadow: 0 10px 30px rgb(0 0 30 / 50%);
+}
+
+.option {
+    height: 58px;
+    padding: 0 14px;
+    font-size: 28px;
+    line-height: 58px;
+    cursor: pointer;
+
+    .tick {
+        display: inline-block;
+        width: 34px;
         color: var(--slyk-bluetext);
     }
 
-    .more {
-        color: var(--slyk-bluetext);
+    &.selected {
+        font-weight: 700;
+        background: var(--sky-focus-bg);
+        outline: var(--sky-focus-border);
+        outline-offset: -1.5px;
     }
 }

@@ -1,57 +1,65 @@
-<app-slyk-template title="Setup" />
+<app-slyk-template title="Settings" />
 
-<!-- description 540,140 1002×195 -->
-<div class="description slyk-abs">{{ description() }}</div>
+<!-- sections in the left column -->
+@if (area() === 'column') {
+    <div class="sky-focus col-focus" [style.top.px]="530 + section() * 70"></div>
+}
+@for (s of sections; track s.label; let i = $index) {
+    <div
+        class="col-item slyk-abs slyk-nowrap"
+        role="option"
+        tabindex="-1"
+        [attr.aria-selected]="i === section()"
+        [class.selected]="i === section()"
+        [style.top.px]="530 + i * 70"
+        (click)="area.set('column'); pickSection(i)"
+        (keydown.enter)="pickSection(i)"
+    >
+        {{ s.label }}
+    </div>
+}
 
-<!-- config: 540,385 1002×624, itemHeight 78, setup-bg.png rules -->
-<div class="slyk-rows" style="left: 540px; top: 384px; width: 1002px; height: 624px"></div>
+<!-- rows: label left, value right; the focused one holds its help text -->
 <div
-    class="slyk-selectbar"
-    style="left: 540px; width: 1002px; height: 78px"
-    [style.top.px]="385 + index() * 78"
+    class="sky-focus row-focus"
+    [class.dim]="area() !== 'rows'"
+    [style.top.px]="rowTop(index())"
+    [style.height.px]="rowHeight + helpHeight"
 ></div>
-@for (row of rows; track row.label; let i = $index) {
+@for (r of rows(); track r.label; let i = $index) {
     <div
         class="row slyk-abs"
-        [style.top.px]="385 + i * 78"
         role="option"
         tabindex="-1"
         [attr.aria-selected]="i === index()"
-        (mouseenter)="index.set(i)"
-        (click)="activate(row)"
-        (keydown.enter)="activate(row)"
+        [class.selected]="i === index()"
+        [style.top.px]="rowTop(i)"
+        (click)="area.set('rows'); activate(i)"
+        (keydown.enter)="activate(i)"
     >
-        <span class="label">{{ row.label }}</span>
-        @if (row.choices) {
-            <span class="value">
-                @if (i === index()) {
-                    <span
-                        class="arrow"
-                        role="button"
-                        tabindex="-1"
-                        aria-label="Previous value"
-                        (click)="$event.stopPropagation(); cycle(row, -1)"
-                        (keydown.enter)="cycle(row, -1)"
-                        >‹</span
-                    >
-                }
-                {{ valueLabel(row) }}
-                @if (i === index()) {
-                    <span
-                        class="arrow"
-                        role="button"
-                        tabindex="-1"
-                        aria-label="Next value"
-                        (click)="$event.stopPropagation(); cycle(row, 1)"
-                        (keydown.enter)="cycle(row, 1)"
-                        >›</span
-                    >
-                }
-            </span>
-        } @else if (row.link) {
-            <span class="value more">›</span>
+        <span class="label">{{ r.label }}</span>
+        <span class="value">{{ valueLabel(r) }}</span>
+    </div>
+}
+<div class="help slyk-abs" [style.top.px]="rowTop(index()) + rowHeight - 6">{{ row().help }}</div>
+
+<!-- option column with a tick on the current value -->
+@if (area() === 'options') {
+    <div class="options slyk-abs" [style.top.px]="rowTop(index())">
+        @for (o of visibleOptions(); track $index; let i = $index) {
+            <div
+                class="option slyk-nowrap"
+                role="option"
+                tabindex="-1"
+                [attr.aria-selected]="optionFirst() + i === optionIndex()"
+                [class.selected]="optionFirst() + i === optionIndex()"
+                (click)="choose(o)"
+                (keydown.enter)="choose(o)"
+            >
+                <span class="tick">{{ isCurrent(o) ? '✓' : '' }}</span>{{ o.label }}
+            </div>
         }
     </div>
 }
 
-<app-slyk-buttons [labels]="['Cancel', 'Save']" />
+<app-slyk-buttons />

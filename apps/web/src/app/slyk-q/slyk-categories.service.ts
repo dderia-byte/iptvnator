@@ -90,9 +90,12 @@ export class SlykCategoriesService {
     stepRegion(delta: 1 | -1): void {
         const options = [REGION_ALL, ...this.regions().map((r) => r.code)];
         const index = options.indexOf(this.region());
-        const next = options[(index + delta + options.length) % options.length];
-        this.regionChoice.set(next);
-        writeRegion(next);
+        this.setRegion(options[(index + delta + options.length) % options.length]);
+    }
+
+    setRegion(region: string): void {
+        this.regionChoice.set(region);
+        writeRegion(region);
     }
 
     inRegion(channel: Channel): boolean {

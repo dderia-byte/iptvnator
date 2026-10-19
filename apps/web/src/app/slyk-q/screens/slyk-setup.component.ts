@@ -9,42 +9,49 @@ import {
 import { Router } from '@angular/router';
 import { RuntimeCapabilitiesService, SettingsStore } from '@iptvnator/services';
 import { VideoPlayer } from '@iptvnator/shared/interfaces';
-import {
-    SlykButtonsComponent,
-    SlykTemplateComponent,
-} from '../slyk-chrome.component';
+import { SlykButtonsComponent, SlykTemplateComponent } from '../slyk-chrome.component';
+import { REGION_ALL } from '../slyk-categories.service';
 import { SlykKeyPress, wrapIndex } from '../slyk-keys';
 import { SlykNavService, SlykScreen } from '../slyk-nav.service';
+import { SlykTvService } from '../slyk-tv.service';
 
-interface Choice<T> {
-    value: T;
+interface Choice {
+    value: unknown;
     label: string;
 }
 
-interface ConfigRow {
+type SettingKey = 'player' | 'epgOffsetMinutes' | 'stripCountryPrefix' | 'region';
+
+interface SettingRow {
     label: string;
-    description: string;
-    /** Choice rows cycle with left/right; link rows open another screen. */
-    choices?: Choice<unknown>[];
-    key?: 'player' | 'epgOffsetMinutes' | 'stripCountryPrefix';
+    help: string;
+    /** Rows with choices open the option column; link rows open a screen. */
+    key?: SettingKey;
     link?: string;
 }
 
-const PLAYERS: Choice<VideoPlayer>[] = [
-    { value: VideoPlayer.VideoJs, label: 'Video.js' },
-    { value: VideoPlayer.Html5Player, label: 'HTML5' },
-    { value: VideoPlayer.ArtPlayer, label: 'ArtPlayer' },
-];
-const OFFSETS: Choice<number>[] = Array.from({ length: 49 }, (_, i) => {
-    const minutes = (i - 24) * 30;
-    return { value: minutes, label: `${minutes > 0 ? '+' : ''}${minutes} min` };
-});
-const YES_NO: Choice<boolean>[] = [
-    { value: false, label: 'No' },
-    { value: true, label: 'Yes' },
-];
+interface Section {
+    label: string;
+    rows: SettingRow[];
+}
 
-/** Slyk Q `Setup`: a ConfigList with left/right values and Save/Cancel. */
+const OFFSETS: Choice[] = Array.from({ length: 49 }, (_, i) => {
+    const minutes = (i - 24) * 30;
+    return { value: minutes, label: minutes ? `${minutes > 0 ? '+' : ''}${minutes / 60}h` : 'None' };
+});
+const ON_OFF: Choice[] = [
+    { value: false, label: 'Off' },
+    { value: true, label: 'On' },
+];
+const OPTIONS_VISIBLE = 9;
+export const SETTING_ROW = 72;
+export const HELP_HEIGHT = 110;
+
+/**
+ * Sky Q Settings: sections in the left column, label/value rows with help
+ * text in the focused row, and an option column with a tick on the current
+ * value. Choices apply straight away, as on the box.
+ */
 @Component({
     selector: 'app-slyk-setup',
     imports: [SlykTemplateComponent, SlykButtonsComponent],
@@ -56,142 +63,201 @@ export class SlykSetupComponent implements SlykScreen {
     private readonly router = inject(Router);
     private readonly settingsStore = inject(SettingsStore);
     private readonly runtime = inject(RuntimeCapabilitiesService);
+    private readonly tv = inject(SlykTvService);
+    readonly rowHeight = SETTING_ROW;
+    readonly helpHeight = HELP_HEIGHT;
 
-    readonly rows: ConfigRow[] = [
+    readonly sections: Section[] = [
         {
-            label: 'Video player',
-            key: 'player',
-            choices: this.playerChoices(),
-            description: 'Player used for live channels when 4K and Dolby playback (Embedded MPV) is off. With it on, Embedded MPV plays every channel. External MPV/VLC stay in Classic View settings.',
-        },
-        {
-            label: 'EPG time offset',
-            key: 'epgOffsetMinutes',
-            choices: OFFSETS,
-            description: 'Shift programme times when your guide data uses a different time zone.',
-        },
-        {
-            label: 'Strip country prefix',
-            key: 'stripCountryPrefix',
-            choices: YES_NO,
-            description: 'Hide prefixes such as "UK:" or "DE |" in channel names.',
+            label: 'Setup',
+            rows: [
+                { label: 'Video player', key: 'player', help: 'Player for live channels when Embedded MPV (4K and Dolby) is off. With it on, Embedded MPV plays everything.' },
+                { label: 'Region', key: 'region', help: 'The country the TV guide categories and Home rows show channels for.' },
+                { label: 'Hide country prefix', key: 'stripCountryPrefix', help: 'Hide prefixes such as "UK:" or "DE |" in channel names.' },
+            ],
         },
         {
             label: 'Playlists and sources',
-            link: '/workspace/sources',
-            description: 'Add, edit or remove M3U playlists, Xtream Codes and Stalker sources.',
+            rows: [
+                { label: 'Your playlists', link: '/tv/playlists', help: 'Switch between playlists, or add an Xtream account or M3U playlist.' },
+                { label: 'Manage sources', link: '/workspace/sources', help: 'Edit or remove M3U playlists, Xtream Codes and Stalker sources.' },
+            ],
         },
         {
-            label: 'EPG sources',
-            link: '/workspace/settings/epg',
-            description: 'Manage XMLTV guide sources and refresh programme data.',
+            label: 'TV guide',
+            rows: [
+                { label: 'Guide time offset', key: 'epgOffsetMinutes', help: 'Shift programme times when your guide data uses a different time zone.' },
+                { label: 'Guide sources', link: '/workspace/settings/epg', help: 'Manage XMLTV guide sources and refresh programme data.' },
+            ],
         },
         {
-            label: 'All settings',
-            link: '/workspace/settings',
-            description: 'Every IPTVnator setting, including players, backup and remote control.',
-        },
-        {
-            label: 'About this interface',
-            description: 'Layout after the Slyk Q 1080 Enigma2 skin by kiddac (linuxsat-support.com). Graphics recreated; no skin artwork or fonts are bundled.',
+            label: 'Advanced',
+            rows: [
+                { label: 'All settings', link: '/workspace/settings', help: 'Every IPTVnator setting, including players, backup and remote control.' },
+            ],
         },
     ];
 
+    readonly area = signal<'column' | 'rows' | 'options'>('rows');
+    readonly section = signal(0);
     readonly index = signal(0);
-    /** Pending values; written on Save (green / OK), dropped on Cancel. */
-    readonly draft = signal<Record<string, unknown>>(this.currentValues());
-    readonly dirty = signal(false);
-    readonly description = computed(() => this.rows[this.index()].description);
+    readonly optionIndex = signal(0);
+    /** Bumped after a change so values re-read the settings. */
+    private readonly revision = signal(0);
+
+    readonly rows = computed(() => this.sections[this.section()].rows);
+    readonly row = computed(() => this.rows()[this.index()]);
+    readonly options = computed(() => this.choicesFor(this.row()?.key));
+    readonly optionFirst = computed(() =>
+        Math.min(Math.max(0, this.optionIndex() - 2), Math.max(0, this.options().length - OPTIONS_VISIBLE))
+    );
+    readonly visibleOptions = computed(() =>
+        this.options().slice(this.optionFirst(), this.optionFirst() + OPTIONS_VISIBLE)
+    );
 
     constructor() {
         inject(SlykNavService).register(this, inject(DestroyRef), 'pig');
     }
 
-    valueLabel(row: ConfigRow): string {
-        if (!row.choices || !row.key) {
-            return '';
+    /** Top of row `i`: rows below the focused one make room for its help. */
+    rowTop(i: number): number {
+        return 420 + i * SETTING_ROW + (i > this.index() ? HELP_HEIGHT : 0);
+    }
+
+    valueLabel(row: SettingRow): string {
+        if (!row.key) {
+            return row.link ? '›' : '';
         }
-        const value = this.draft()[row.key];
-        return row.choices.find((c) => c.value === value)?.label ?? String(value ?? '');
+        const value = this.value(row.key);
+        return this.choicesFor(row.key).find((c) => c.value === value)?.label ?? String(value ?? '');
+    }
+
+    isCurrent(choice: Choice): boolean {
+        return choice.value === this.value(this.row()?.key);
+    }
+
+    pickSection(i: number): void {
+        this.section.set(i);
+        this.index.set(0);
+    }
+
+    activate(i = this.index()): void {
+        this.index.set(i);
+        const row = this.rows()[i];
+        if (row.link) {
+            void this.router.navigateByUrl(row.link);
+        } else if (row.key) {
+            this.area.set('options');
+            this.optionIndex.set(Math.max(0, this.options().findIndex((c) => this.isCurrent(c))));
+        }
+    }
+
+    async choose(choice: Choice): Promise<void> {
+        const key = this.row().key;
+        if (key === 'region') {
+            this.tv.categories.setRegion(choice.value as string);
+        } else if (key) {
+            await this.settingsStore.updateSettings({ [key]: choice.value });
+        }
+        this.revision.update((r) => r + 1);
+        this.area.set('rows');
     }
 
     onKey({ key }: SlykKeyPress): boolean {
-        const row = this.rows[this.index()];
+        const area = this.area();
+        if (area === 'options') {
+            return this.onOptionKey(key);
+        }
+        if (area === 'column') {
+            switch (key) {
+                case 'up':
+                case 'down':
+                    this.pickSection(wrapIndex(this.section(), key === 'up' ? -1 : 1, this.sections.length));
+                    return true;
+                case 'right':
+                case 'ok':
+                    this.area.set('rows');
+                    return true;
+                default:
+                    return false;
+            }
+        }
         switch (key) {
             case 'up':
             case 'down':
-                this.index.update((i) =>
-                    wrapIndex(i, key === 'up' ? -1 : 1, this.rows.length)
-                );
+                this.index.update((i) => wrapIndex(i, key === 'up' ? -1 : 1, this.rows().length));
                 return true;
             case 'left':
+                this.area.set('column');
+                return true;
             case 'right':
-                this.cycle(row, key === 'left' ? -1 : 1);
-                return true;
             case 'ok':
-                if (row.link) {
-                    void this.router.navigateByUrl(row.link);
-                } else {
-                    void this.save();
-                }
-                return true;
-            case 'green':
-                void this.save();
-                return true;
-            case 'red':
-            case 'back':
-                this.draft.set(this.currentValues());
-                this.dirty.set(false);
-                void this.router.navigateByUrl('/tv');
+                this.activate();
                 return true;
             default:
                 return false;
         }
     }
 
-    /** Click: links open, values step forward (the arrows step either way). */
-    activate(row: ConfigRow): void {
-        if (row.link) {
-            void this.router.navigateByUrl(row.link);
-        } else {
-            this.cycle(row, 1);
+    private onOptionKey(key: string): boolean {
+        const count = this.options().length;
+        switch (key) {
+            case 'up':
+            case 'down':
+                this.optionIndex.update((i) => Math.min(count - 1, Math.max(0, i + (key === 'up' ? -1 : 1))));
+                return true;
+            case 'ok':
+                void this.choose(this.options()[this.optionIndex()]);
+                return true;
+            case 'left':
+            case 'back':
+                this.area.set('rows');
+                return true;
+            default:
+                return true;
         }
     }
 
-    cycle(row: ConfigRow, delta: 1 | -1): void {
-        if (!row.choices || !row.key) {
-            return;
+    private value(key: SettingKey | undefined): unknown {
+        this.revision();
+        switch (key) {
+            case 'player':
+                return this.settingsStore.player() ?? VideoPlayer.VideoJs;
+            case 'epgOffsetMinutes':
+                return this.settingsStore.resolvedEpgOffsetMinutes();
+            case 'stripCountryPrefix':
+                return !!this.settingsStore.stripCountryPrefix?.();
+            case 'region':
+                return this.tv.categories.region();
+            default:
+                return undefined;
         }
-        const key = row.key;
-        const current = row.choices.findIndex(
-            (c) => c.value === this.draft()[key]
-        );
-        const next = row.choices[wrapIndex(Math.max(0, current), delta, row.choices.length)];
-        this.draft.update((d) => ({ ...d, [key]: next.value }));
-        this.dirty.set(true);
     }
 
-    async save(): Promise<void> {
-        if (this.dirty()) {
-            await this.settingsStore.updateSettings(this.draft());
-            this.dirty.set(false);
+    private choicesFor(key: SettingKey | undefined): Choice[] {
+        switch (key) {
+            case 'player': {
+                const players: Choice[] = [
+                    { value: VideoPlayer.VideoJs, label: 'Video.js' },
+                    { value: VideoPlayer.Html5Player, label: 'HTML5' },
+                    { value: VideoPlayer.ArtPlayer, label: 'ArtPlayer' },
+                ];
+                if (this.runtime.supportsEmbeddedMpv) {
+                    players.push({ value: VideoPlayer.EmbeddedMpv, label: 'Embedded MPV' });
+                }
+                return players;
+            }
+            case 'epgOffsetMinutes':
+                return OFFSETS;
+            case 'stripCountryPrefix':
+                return ON_OFF;
+            case 'region':
+                return [
+                    { value: REGION_ALL, label: 'All' },
+                    ...this.tv.categories.regions().map((r) => ({ value: r.code, label: r.code })),
+                ];
+            default:
+                return [];
         }
-        void this.router.navigateByUrl('/tv');
-    }
-
-    private currentValues(): Record<string, unknown> {
-        return {
-            player: this.settingsStore.player() ?? VideoPlayer.VideoJs,
-            epgOffsetMinutes: this.settingsStore.resolvedEpgOffsetMinutes(),
-            stripCountryPrefix: !!this.settingsStore.stripCountryPrefix?.(),
-        };
-    }
-
-    private playerChoices(): Choice<VideoPlayer>[] {
-        const choices = [...PLAYERS];
-        if (this.runtime.supportsEmbeddedMpv) {
-            choices.push({ value: VideoPlayer.EmbeddedMpv, label: 'Embedded MPV' });
-        }
-        return choices;
     }
 }
