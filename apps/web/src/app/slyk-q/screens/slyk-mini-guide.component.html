@@ -1,7 +1,9 @@
-<!-- dark strip along the bottom third, over the live picture -->
-<div class="strip slyk-abs"></div>
+<!-- light rule across the top of the banner; the picture shows through -->
+<div class="shade slyk-abs"></div>
+<div class="rule slyk-abs"></div>
 
 <!-- left: menu, the channel between chevrons, day and time -->
+<div class="menu-band slyk-abs"></div>
 <div
     class="menu slyk-abs"
     role="button"
@@ -9,7 +11,7 @@
     (click)="openMenu()"
     (keydown.enter)="openMenu()"
 >
-    ‹ Menu
+    <span class="menu-arrow"></span>Menu
 </div>
 <div
     class="chevron up slyk-abs"
@@ -19,10 +21,7 @@
     (click)="stepChannel(1)"
     (keydown.enter)="stepChannel(1)"
 ></div>
-<div class="channel slyk-abs">
-    <span class="c-name slyk-nowrap">{{ name() }}</span>
-    <span class="c-num">{{ number() }}</span>
-</div>
+<div class="channel slyk-abs slyk-nowrap">{{ name() }}&nbsp;&nbsp; {{ number() }}</div>
 <div
     class="chevron down slyk-abs"
     role="button"
@@ -33,31 +32,29 @@
 ></div>
 <div class="when slyk-abs">{{ when() }}</div>
 
-<!-- middle: the focused programme as a large card -->
-@for (c of [channel()]; track c?.id) {
-    <div
-        class="card slyk-abs"
-        role="button"
-        tabindex="-1"
-        (click)="watch()"
-        (keydown.enter)="watch()"
-    >
-        <div class="thumb">
-            @if (c) {
-                <app-slyk-logo class="thumb-logo" [channel]="c" [name]="name()" />
-            }
-            <div class="thumb-progress"><span [style.width.%]="progress()"></span></div>
-        </div>
-        <div class="start">{{ current() ? time(current()!.startMs) : '' }}</div>
-        <div class="info">
-            <div class="title slyk-nowrap">{{ current()?.title || 'No programme information' }}</div>
-            <div class="desc">{{ current()?.description }}</div>
-        </div>
-        <div class="badges">
-            <span class="badge">{{ badge() }}</span>
-        </div>
+<!-- middle: the selected programme in a dark panel -->
+<div
+    class="panel slyk-abs"
+    role="button"
+    tabindex="-1"
+    (click)="watch()"
+    (keydown.enter)="watch()"
+>
+    <div class="thumb">
+        @if (art(current()); as image) {
+            <img [src]="image" alt="" />
+        } @else if (channel(); as c) {
+            <app-slyk-logo class="fallback-logo" [channel]="c" [name]="name()" />
+        }
+        <div class="thumb-progress"><span [style.width.%]="progress()"></span></div>
     </div>
-}
+    <div class="start">{{ current() ? time(current()!.startMs) : '' }}</div>
+    <div class="badges">
+        <span class="badge">{{ badge() }}</span>
+    </div>
+    <div class="title slyk-nowrap">{{ current()?.title || name() }}</div>
+    <div class="desc">{{ current() ? current()!.description : 'No programme information' }}</div>
+</div>
 
 <!-- right: what follows, running off the edge -->
 @for (p of upcoming(); track p.startMs; let i = $index) {
@@ -65,13 +62,15 @@
         class="next slyk-abs"
         role="button"
         tabindex="-1"
-        [style.left.px]="1330 + i * 330"
+        [style.left.px]="1586 + i * 300"
         (click)="stepProgramme(1)"
         (keydown.enter)="stepProgramme(1)"
     >
         <div class="n-title slyk-nowrap">{{ p.title }}</div>
         <div class="n-thumb">
-            @if (channel(); as c) {
+            @if (art(p); as image) {
+                <img [src]="image" alt="" />
+            } @else if (channel(); as c) {
                 <app-slyk-logo class="n-logo" [channel]="c" [name]="name()" />
             }
         </div>

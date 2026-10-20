@@ -1,4 +1,4 @@
-<!-- the whole picture: click toggles the infobar, like OK -->
+<!-- the whole picture: click brings up the banner, like OK -->
 <div
     class="surface slyk-abs"
     role="button"
@@ -20,38 +20,6 @@
                 (keydown.enter)="action.run()"
                 >{{ action.label }}</span
             >
-        }
-    </div>
-}
-
-@if (infobar() && channel()) {
-    <!-- Sky Q style banner: logo, what's on, progress and what's next -->
-    <div class="ib-shade slyk-abs"></div>
-    <div class="ib-clock slyk-abs">{{ clock() }}</div>
-    <app-slyk-logo class="ib-logo slyk-abs" [channel]="channel()" [name]="name()" />
-    <div class="ib-channel slyk-abs slyk-nowrap">
-        <span class="num">{{ number() }}</span> {{ name() }}
-        <span class="ib-badge">{{ badge() }}</span>
-    </div>
-    @if (info().now; as now) {
-        <div class="ib-title slyk-abs slyk-nowrap">{{ now.title }}</div>
-        <div class="ib-time slyk-abs">{{ nowStart() }} – {{ nowEnd() }}</div>
-        <div class="ib-progress slyk-abs"><span [style.width.%]="progress()"></span></div>
-        <div class="ib-desc slyk-abs">{{ now.description }}</div>
-    } @else {
-        <div class="ib-title slyk-abs slyk-nowrap">{{ name() }}</div>
-        <div class="ib-time slyk-abs">No programme information</div>
-    }
-    @if (info().next; as next) {
-        <div class="ib-next slyk-abs slyk-nowrap">
-            <span class="label">Next</span> {{ nextStart() }} &nbsp;{{ next.title }}
-        </div>
-    }
-    <div class="ib-hints slyk-abs">
-        @if (browse()) {
-            <span class="browsing">Browsing</span> &nbsp; OK Watch this channel &nbsp;&nbsp; Back Return
-        } @else {
-            OK or ▲ Mini guide &nbsp;&nbsp; ▼ Browse channels
         }
     </div>
 }
