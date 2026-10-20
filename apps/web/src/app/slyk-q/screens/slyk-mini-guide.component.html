@@ -1,55 +1,80 @@
-<!-- infobar-epg.png band from 705 down -->
-<div class="band slyk-abs"></div>
-<div class="bouquet slyk-abs slyk-bold slyk-shadow">{{ tv.bouquet().label }}</div>
-<div class="timeline slyk-abs"></div>
-@for (label of guide.labels(); track label.left) {
-    <div class="time slyk-abs" [style.left.px]="serviceWidth + 15 + label.left">
-        {{ label.label }}
-    </div>
-}
+<!-- dark strip along the bottom third, over the live picture -->
+<div class="strip slyk-abs"></div>
 
-@for (row of guide.rows(); track $index; let r = $index) {
+<!-- left: menu, the channel between chevrons, day and time -->
+<div
+    class="menu slyk-abs"
+    role="button"
+    tabindex="-1"
+    (click)="openMenu()"
+    (keydown.enter)="openMenu()"
+>
+    ‹ Menu
+</div>
+<div
+    class="chevron up slyk-abs"
+    role="button"
+    tabindex="-1"
+    aria-label="Next channel"
+    (click)="stepChannel(1)"
+    (keydown.enter)="stepChannel(1)"
+></div>
+<div class="channel slyk-abs">
+    <span class="c-name slyk-nowrap">{{ name() }}</span>
+    <span class="c-num">{{ number() }}</span>
+</div>
+<div
+    class="chevron down slyk-abs"
+    role="button"
+    tabindex="-1"
+    aria-label="Previous channel"
+    (click)="stepChannel(-1)"
+    (keydown.enter)="stepChannel(-1)"
+></div>
+<div class="when slyk-abs">{{ when() }}</div>
+
+<!-- middle: the focused programme as a large card -->
+@for (c of [channel()]; track c?.id) {
     <div
-        class="service slyk-abs slyk-nowrap"
-        [class.selected]="r === guide.selectedRow()"
-        [style.top.px]="795 + r * rowHeight"
-        [style.height.px]="rowHeight"
+        class="card slyk-abs"
         role="button"
         tabindex="-1"
-        (mouseenter)="pickRow(r)"
-        (click)="pickRow(r); watch()"
+        (click)="watch()"
         (keydown.enter)="watch()"
     >
-        <app-slyk-logo
-            class="logo"
-            [channel]="row.channel"
-            [name]="tv.displayName(row.channel)"
-            [style.height.px]="rowHeight - 10"
-        />
-        <span class="name slyk-nowrap">{{ tv.displayName(row.channel) }}</span>
-    </div>
-    @for (cell of row.cells; track cell.left; let c = $index) {
-        <div
-            class="cell slyk-abs slyk-nowrap"
-            [class.now]="cell.isNow"
-            [class.selected]="r === guide.selectedRow() && c === guide.selectedCellIndex()"
-            [style.left.px]="serviceWidth + cell.left"
-            [style.width.px]="cell.width"
-            [style.top.px]="795 + r * rowHeight"
-            [style.height.px]="rowHeight"
-            role="button"
-            tabindex="-1"
-            (mouseenter)="pick(r, cell.left + 1)"
-            (click)="pick(r, cell.left + 1); watch()"
-            (keydown.enter)="watch()"
-        >
-            {{ cell.event ? cell.title : '' }}
+        <div class="thumb">
+            @if (c) {
+                <app-slyk-logo class="thumb-logo" [channel]="c" [name]="name()" />
+            }
+            <div class="thumb-progress"><span [style.width.%]="progress()"></span></div>
         </div>
-    }
-}
-@if (guide.nowX() !== null) {
-    <div class="now-marker" [style.left.px]="serviceWidth + guide.nowX()! - 11"></div>
+        <div class="start">{{ current() ? time(current()!.startMs) : '' }}</div>
+        <div class="info">
+            <div class="title slyk-nowrap">{{ current()?.title || 'No programme information' }}</div>
+            <div class="desc">{{ current()?.description }}</div>
+        </div>
+        <div class="badges">
+            <span class="badge">{{ badge() }}</span>
+        </div>
+    </div>
 }
 
-<div class="date slyk-abs">{{ date() }}</div>
-<app-slyk-buttons [labels]="buttons" [full]="true" />
+<!-- right: what follows, running off the edge -->
+@for (p of upcoming(); track p.startMs; let i = $index) {
+    <div
+        class="next slyk-abs"
+        role="button"
+        tabindex="-1"
+        [style.left.px]="1330 + i * 330"
+        (click)="stepProgramme(1)"
+        (keydown.enter)="stepProgramme(1)"
+    >
+        <div class="n-title slyk-nowrap">{{ p.title }}</div>
+        <div class="n-thumb">
+            @if (channel(); as c) {
+                <app-slyk-logo class="n-logo" [channel]="c" [name]="name()" />
+            }
+        </div>
+        <div class="n-start">{{ time(p.startMs) }}</div>
+    </div>
+}

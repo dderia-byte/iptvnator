@@ -47,7 +47,7 @@ export class SlykWatchComponent implements SlykScreen {
         { label: 'Menu', run: () => this.nav.press('menu') },
         { label: 'Channels', run: () => void this.router.navigateByUrl('/tv/channels') },
         { label: 'TV Guide', run: () => this.nav.press('epg') },
-        { label: 'Mini Guide', run: () => this.nav.press('right') },
+        { label: 'Mini Guide', run: () => this.openMiniGuide() },
         { label: 'CH −', run: () => this.nav.press('channelDown') },
         { label: 'CH +', run: () => this.nav.press('channelUp') },
         { label: 'Info', run: () => this.nav.press('info') },
@@ -122,6 +122,11 @@ export class SlykWatchComponent implements SlykScreen {
         this.infobar.set(false);
     }
 
+    openMiniGuide(): void {
+        this.hideInfobar();
+        this.miniGuide.set(true);
+    }
+
     closeMiniGuide(): void {
         this.miniGuide.set(false);
     }
@@ -140,10 +145,9 @@ export class SlykWatchComponent implements SlykScreen {
                     if (browsed) {
                         this.tv.play(browsed);
                     }
-                } else if (this.infobar()) {
-                    this.hideInfobar();
                 } else {
-                    this.showInfobar();
+                    // Sky Q: Select brings up the mini guide.
+                    this.openMiniGuide();
                 }
                 return true;
             case 'info':
@@ -154,19 +158,18 @@ export class SlykWatchComponent implements SlykScreen {
             case 'channelDown':
                 this.tv.zap(key === 'channelUp' ? 1 : -1);
                 return true;
-            case 'up':
             case 'down':
-                // Browse other channels' now and next in the banner.
+                // Down shows the banner, then browses other channels in it.
                 if (this.infobar()) {
-                    this.browse.update((b) => b + (key === 'up' ? 1 : -1));
+                    this.browse.update((b) => b - 1);
                 }
                 this.showInfobar();
                 void this.epg.load([this.channel()].filter((c) => !!c) as Channel[]);
                 return true;
+            case 'up':
             case 'left':
             case 'right':
-                this.hideInfobar();
-                this.miniGuide.set(true);
+                this.openMiniGuide();
                 return true;
             case 'back':
                 // Back clears a half-typed channel number, otherwise leaves

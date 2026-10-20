@@ -1,172 +1,214 @@
-// q-infobars/infobar-epg.png: dark fade into a blue band behind the grid.
-.band {
+// Sky Q mini guide: a dark strip over the bottom third of the picture.
+.strip {
     left: 0;
     top: 660px;
     width: 1920px;
     height: 420px;
-    z-index: 1;
-    background:
-        linear-gradient(180deg, transparent 0, rgb(0 0 0 / 55%) 70px, transparent 72px),
-        linear-gradient(90deg, #0d4c94 0%, #0b56a8 40%, #0a6ad0 100%) 0 73px / 100% 100% no-repeat;
-}
-
-.bouquet {
-    left: 12px;
-    top: 678px;
-    width: 1896px;
-    height: 54px;
-    line-height: 54px;
-}
-
-// epg/TimeLineBG.png at 0,733 1920×83 (times row 749)
-.timeline {
-    left: 0;
-    top: 733px;
-    width: 1920px;
-    height: 62px;
     z-index: 2;
-    background: linear-gradient(90deg, rgb(255 255 255 / 30%), rgb(255 255 255 / 4%) 18%, transparent);
-    border-top: 2px solid rgb(160 200 255 / 60%);
-}
-
-.time {
-    top: 749px;
-    height: 36px;
-    z-index: 3;
-    font-size: 30px;
-    line-height: 36px;
-}
-
-.service {
-    left: 0;
-    width: 375px;
-    padding-left: 18px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    background: var(--slyk-epg);
-    border-bottom: 1px solid var(--slyk-epg-border);
-    font-size: 30px;
-    color: #eee;
-
-    &.selected {
-        background: var(--slyk-epg-selected);
-        color: #fff;
-    }
-}
-
-.cell {
-    padding-left: 15px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    background: var(--slyk-epg);
-    border: 1px solid var(--slyk-epg-border);
-    font-size: 30px;
-    color: #eee;
-
-    &.now {
-        background: var(--slyk-epg-now);
-        color: #fff;
-    }
-
-    &.selected {
-        background: var(--slyk-epg-selected);
-        color: #fff;
-    }
-}
-
-.now-marker {
-    position: absolute;
-    top: 795px;
-    width: 23px;
-    height: 220px;
-    z-index: 4;
-    pointer-events: none;
-
-    &::after {
-        content: '';
-        position: absolute;
-        left: 11px;
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background: rgb(201 230 255 / 60%);
-    }
-}
-
-.date {
-    left: 11px;
-    top: 1030px;
-    width: 360px;
-    height: 38px;
-    font-size: 30px;
-    line-height: 38px;
-}
-
-.service {
-    gap: 10px;
-
-    .logo {
-        width: 84px;
-        --slyk-logo-font: 13px;
-    }
-
-    .name {
-        flex: 1;
-        min-width: 0;
-    }
-}
-
-// Sky Q mini guide: the panel slides up over the picture.
-.band,
-.bouquet,
-.timeline,
-.time,
-.service,
-.cell,
-.date {
+    background: linear-gradient(180deg, transparent, rgb(2 8 26 / 82%) 70px, rgb(2 8 26 / 94%));
     animation: slyk-rise var(--slyk-slide) both;
 }
 
-// ----- Sky Q restyle: navy panel, guide-style rows, focus box --------------
-.band {
-    background: linear-gradient(180deg, transparent, rgb(2 10 30 / 80%) 60px, rgb(2 10 30 / 94%));
+.menu,
+.chevron,
+.channel,
+.when,
+.card,
+.next {
+    z-index: 3;
+    animation: slyk-rise var(--slyk-slide) both;
 }
 
-.timeline {
-    background: rgb(255 255 255 / 6%);
-    border-top: none;
-    border-bottom: 1px solid rgb(255 255 255 / 45%);
+.menu {
+    left: 70px;
+    top: 730px;
+    font-size: 26px;
+    color: rgb(255 255 255 / 80%);
+    cursor: pointer;
 }
 
-.service,
-.cell {
-    background: rgb(26 85 222 / 55%);
-    border: none;
-    border-bottom: 1px solid rgb(255 255 255 / 25%);
-}
+.chevron {
+    left: 230px;
+    width: 26px;
+    height: 26px;
+    box-sizing: border-box;
+    border-left: 4px solid #fff;
+    border-top: 4px solid #fff;
+    cursor: pointer;
 
-.cell {
-    border-left: 1px solid rgb(255 255 255 / 30%);
-
-    &.now {
-        background: rgb(26 85 222 / 55%);
+    &.up {
+        top: 800px;
+        transform: rotate(45deg);
     }
 
-    &.selected {
-        background: rgb(42 115 238 / 95%);
-        font-weight: 700;
+    &.down {
+        top: 900px;
+        transform: rotate(225deg);
     }
 }
 
-.service.selected {
+.channel {
+    left: 70px;
+    top: 838px;
+    width: 400px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-size: 36px;
+    font-weight: 700;
+
+    .c-name {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .c-num {
+        color: rgb(255 255 255 / 85%);
+    }
+}
+
+.when {
+    left: 70px;
+    top: 950px;
+    font-size: 26px;
+    color: rgb(255 255 255 / 80%);
+}
+
+// the focused programme: a highlighted navy card
+.card {
+    left: 510px;
+    top: 740px;
+    width: 790px;
+    height: 280px;
+    box-sizing: border-box;
+    border-radius: 6px;
     background: var(--sky-focus-bg);
     outline: var(--sky-focus-border);
-    outline-offset: -1.5px;
+    box-shadow: 0 10px 30px rgb(0 0 20 / 50%);
+    cursor: pointer;
+}
+
+.thumb {
+    position: absolute;
+    left: 22px;
+    top: 26px;
+    width: 300px;
+    height: 169px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 4px;
+    background:
+        radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 16%), transparent 65%),
+        #1a4fc4;
+
+    .thumb-logo {
+        width: 200px;
+        height: 112px;
+        background: none;
+        --slyk-logo-font: 22px;
+    }
+}
+
+.thumb-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5px;
+    background: rgb(255 255 255 / 25%);
+
+    span {
+        display: block;
+        height: 100%;
+        background: var(--slyk-progress);
+    }
+}
+
+.start {
+    position: absolute;
+    left: 22px;
+    top: 208px;
+    font-size: 26px;
+}
+
+.info {
+    position: absolute;
+    left: 346px;
+    top: 24px;
+    right: 22px;
+
+    .title {
+        font-size: 34px;
+        font-weight: 700;
+    }
+
+    .desc {
+        margin-top: 6px;
+        max-height: 108px;
+        overflow: hidden;
+        font-size: 24px;
+        line-height: 36px;
+        color: rgb(255 255 255 / 88%);
+    }
+}
+
+.badges {
+    position: absolute;
+    right: 22px;
+    bottom: 20px;
+    display: flex;
+    gap: 8px;
+}
+
+.badge {
+    padding: 0 7px;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px;
+
+    &.filled {
+        background: #fff;
+        color: #0a1660;
+    }
+}
+
+// upcoming programmes, cut off at the right edge
+.next {
+    top: 752px;
+    width: 310px;
+    cursor: pointer;
+}
+
+.n-title {
+    font-size: 26px;
     font-weight: 700;
 }
 
-.now-marker {
-    display: none;
+.n-thumb {
+    margin-top: 10px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background:
+        radial-gradient(ellipse at 50% 30%, rgb(255 255 255 / 12%), transparent 65%),
+        #163f9c;
+
+    .n-logo {
+        width: 170px;
+        height: 96px;
+        background: none;
+        --slyk-logo-font: 20px;
+    }
+}
+
+.n-start {
+    margin-top: 8px;
+    font-size: 24px;
+    color: rgb(255 255 255 / 85%);
 }
