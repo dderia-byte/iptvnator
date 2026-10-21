@@ -713,7 +713,7 @@
             "STREAM_ENDED": "The live stream ended.",
             "CHECKING_SUPPORT": "Checking embedded MPV support...",
             "NOT_AVAILABLE": "Embedded MPV is not available in this environment.",
-            "FRAME_VIEW_FAILED": "The embedded MPV video view failed to initialize.",
+            "FRAME_VIEW_FAILED": "The picture could not start. The channel may be off air, or your account may be in use on another device. Press Retry to try again.",
             "LOADING_STREAM": "Loading stream…",
             "PLAY": "Play",
             "PAUSE": "Pause",

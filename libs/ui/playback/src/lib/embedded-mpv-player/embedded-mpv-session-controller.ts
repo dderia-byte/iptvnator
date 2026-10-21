@@ -283,9 +283,20 @@ export class EmbeddedMpvSessionController {
                     return;
                 }
                 if (attached === false && !disposed) {
+                    // The helper exits when the stream itself cannot be
+                    // opened, which also fails the attach: keep the
+                    // stream's own error rather than blaming the view.
+                    const reported = untracked(() => this.session());
                     await electron
                         .disposeEmbeddedMpvSession(created.id)
                         .catch(() => undefined);
+                    if (
+                        reported?.id === created.id &&
+                        reported.status === 'error' &&
+                        reported.error
+                    ) {
+                        throw new Error(reported.error);
+                    }
                     throw new Error(
                         this.translate.instant(
                             'EMBEDDED_MPV.PLAYER.FRAME_VIEW_FAILED'

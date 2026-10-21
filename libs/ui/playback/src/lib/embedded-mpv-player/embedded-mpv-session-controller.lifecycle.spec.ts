@@ -266,6 +266,31 @@ describe('EmbeddedMpvSessionController (lifecycle & support edges)', () => {
                 'Die MPV-Videoansicht konnte nicht starten.'
             );
         });
+
+        it("keep the stream's own error when the helper fails before the view attaches", async () => {
+            const frameCopySupport = createSupport('frame-copy');
+            electron.getEmbeddedMpvSupport.mockResolvedValueOnce(frameCopySupport);
+            electron.prepareEmbeddedMpv.mockResolvedValueOnce(frameCopySupport);
+            const controller = TestBed.inject(EmbeddedMpvSessionController);
+            electron.attachEmbeddedMpvFrameView.mockImplementationOnce(async (id: string) => {
+                controller.session.set(
+                    createSession({ id, status: 'error', error: 'no audio or video data played' })
+                );
+                return false;
+            });
+
+            await waitFor(
+                () => controller.support() === frameCopySupport,
+                'frame-copy support probe to resolve'
+            );
+            controller.startSession(createHost(), createPlayback(), 0.5);
+            await waitFor(
+                () => controller.session()?.status === 'error' && !controller.sessionId(),
+                'error session to be set'
+            );
+
+            expect(controller.session()?.error).toBe('no audio or video data played');
+        });
     });
 
     it('retry clears session state, stall flag, and bumps the retry token', () => {
