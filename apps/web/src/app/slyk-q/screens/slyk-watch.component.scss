@@ -37,38 +37,3 @@
     height: 1080px;
     z-index: 1;
 }
-
-// SecondInfoBar band: blackglass top strip with the soft shadow under it.
-.mouse-bar {
-    left: 0;
-    top: 0;
-    width: 1920px;
-    height: 159px;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 45px;
-    box-sizing: border-box;
-    background: linear-gradient(180deg, rgb(0 0 0 / 80%), rgb(0 0 0 / 55%));
-    box-shadow: 0 12px 18px rgb(0 0 0 / 35%);
-    border-bottom: 1px solid rgb(255 255 255 / 18%);
-}
-
-.mouse-button {
-    height: 78px;
-    padding: 0 30px;
-    line-height: 78px;
-    box-sizing: border-box;
-    border: 1px solid transparent;
-
-    &:hover {
-        background:
-            radial-gradient(ellipse 50px 3px at 50% 3px, rgb(255 255 255 / 90%), transparent),
-            radial-gradient(ellipse 50px 3px at 50% calc(100% - 3px), rgb(255 255 255 / 90%), transparent),
-            var(--slyk-select);
-        border-color: rgb(120 170 230 / 55%);
-    }
-}
-
-

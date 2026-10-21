@@ -34,6 +34,9 @@ const IDLE_MS = 8000;
     imports: [SlykLogoComponent],
     templateUrl: './slyk-mini-guide.component.html',
     styleUrl: './slyk-mini-guide.component.scss',
+    // Layout-free host, like the screens: a boxed host animated by the
+    // screen fade would form its own stacking layer under the video.
+    host: { style: 'display: contents' },
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SlykMiniGuideComponent implements SlykScreen {

@@ -8,22 +8,6 @@
     (keydown.enter)="nav.press('ok')"
 ></div>
 
-@if (nav.pointerActive() && !miniGuide()) {
-    <!-- mouse bar in the SecondInfoBar top band (0,0 1920×159) -->
-    <div class="mouse-bar slyk-abs">
-        @for (action of mouseActions; track action.label) {
-            <span
-                class="mouse-button"
-                role="button"
-                tabindex="-1"
-                (click)="action.run()"
-                (keydown.enter)="action.run()"
-                >{{ action.label }}</span
-            >
-        }
-    </div>
-}
-
 @if (numberEntry()) {
     <!-- NumberZap 54,783 540×270 -->
     <div class="numberzap slyk-abs">

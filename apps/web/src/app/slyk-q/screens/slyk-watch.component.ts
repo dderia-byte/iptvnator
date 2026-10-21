@@ -34,15 +34,6 @@ export class SlykWatchComponent implements SlykScreen {
     readonly miniGuide = signal(false);
     readonly numberEntry = signal('');
     readonly nav = inject(SlykNavService);
-    /** On-screen remote for mouse users, shown while the mouse moves. */
-    readonly mouseActions = [
-        { label: 'Menu', run: () => this.nav.press('menu') },
-        { label: 'Channels', run: () => void this.router.navigateByUrl('/tv/channels') },
-        { label: 'TV Guide', run: () => this.nav.press('epg') },
-        { label: 'Banner', run: () => this.openMiniGuide() },
-        { label: 'CH −', run: () => this.nav.press('channelDown') },
-        { label: 'CH +', run: () => this.nav.press('channelUp') },
-    ];
     private numberTimer?: ReturnType<typeof setTimeout>;
 
     readonly channel = this.tv.activeChannel;
